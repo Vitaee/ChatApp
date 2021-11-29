@@ -11,6 +11,10 @@ from common.security import generate_salt, get_password_hash, verify_password
 async def get_user( conn: AsyncIOMotorClient, field: str, value: str) -> Union[UserInDB, bool]:
     user = await conn[database_name][user_collection_name].find_one( { f"{field}" : value } )
 
+    print()
+    print("get user response")
+    print(user)
+    print()
     if user:
         return UserInDB(**user)
 

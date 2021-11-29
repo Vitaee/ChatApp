@@ -24,7 +24,7 @@ def auth_token( Authorization: str = Header(...)) -> str:
 
     return token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/users/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
 async def get_current_user(db: AsyncIOMotorClient = Depends(get_database), token: str = Depends(oauth2_scheme)) -> User:
     try:
@@ -35,7 +35,9 @@ async def get_current_user(db: AsyncIOMotorClient = Depends(get_database), token
         
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid authorization information!")
     
-    dbuser = await get_user(db, field = "id" , value = token_data.id)
+    print(token_data)
+    print(token_data.id)
+    dbuser = await get_user(db, field = "_id" , value = token_data.id)
 
     if not dbuser:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="User doest not exist!")
@@ -48,6 +50,11 @@ def get_current_user_authorizer(*, required: bool = True):
         return get_current_user
 
 def create_access_token(*, data: dict, expires_delta: Optional[timedelta] = None):
+    print()
+    print("acces token func")
+    print(data)
+    print()
+    
     to_encode = data.copy()
 
     if expires_delta:

@@ -1,4 +1,3 @@
-from re import I
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
@@ -6,7 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 from fastapi_contrib.tracing.utils import setup_opentracing
 from fastapi_contrib.tracing.middlewares import OpentracingMiddleware
-
+from fastapi.staticfiles import StaticFiles
 
 from core.errors import http_error_handler, http422_error_handler
 from db.mongodb_utils import connect_to_mongodb, close_mongo_connection
@@ -37,6 +36,8 @@ app.add_exception_handler(HTTPException, http_error_handler)
 app.add_exception_handler(RequestValidationError, http422_error_handler)
 
 app.include_router(api_router, prefix=API_PREFIX)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == '__main__':
     uvicorn.run(

@@ -2,6 +2,8 @@ from datetime import datetime
 from pydantic import BaseModel, validator, UUID1
 import uuid
 
+from pydantic.main import Extra
+
 class CreatedAtModel(BaseModel):
     createdAt: datetime = None
 
@@ -19,8 +21,13 @@ class UpdatedAtModel(BaseModel):
 
 
 class IDModel(BaseModel):
-    id: str = ''
+    _id: str
 
-    @validator("id", pre=True, always=True)
+        
+    @validator("*", pre=True, always=True)
     def default_id(cls, v, values, **kwargs) -> str:
         return uuid.uuid1().hex
+    
+
+    class Config:
+        underscore_attrs_are_private = True
