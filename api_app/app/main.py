@@ -48,26 +48,3 @@ if __name__ == '__main__':
         workers=1
     )
 
-
-"""
-
-
-@app.post("/file/")
-async def create_files(file: UploadFile = File(...)):
-
-    name_of_file = file.filename.replace(" ", "").split(".")[0]
-
-    if not os.path.isdir('./images'):
-        os.umask(0)
-        os.makedirs('./images',  mode=0o777)
-
-    with open(f"./images/{name_of_file}.png", "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    # <input name="file" type="file">
-
-    return {"file_name": file.filename}
-
-
-"""
-

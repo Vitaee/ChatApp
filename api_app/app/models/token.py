@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class TokenPayload(BaseModel):
-    _id: str
+    username: str
     exp: datetime
     class Config:
         include_private_fields = True

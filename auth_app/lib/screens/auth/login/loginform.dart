@@ -1,6 +1,4 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors, use_key_in_widget_constructors
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
@@ -144,7 +142,7 @@ class SignUpButton extends StatelessWidget {
               'Sign Up',
               style: TextStyle(color: Colors.black),
             ),
-            color: Colors.transparent,
+            color: Colors.transparent, // add signup function
             onPressed: () => Navigator.pushNamed(context, '/signUp'),
           ),
         );

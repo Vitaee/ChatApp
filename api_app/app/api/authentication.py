@@ -1,16 +1,15 @@
-import shutil , os , base64
+import shutil, os 
 from fastapi import APIRouter, Body, Depends, UploadFile, File
 from starlette.exceptions import HTTPException
-from starlette.responses import Response
-from starlette.status import HTTP_400_BAD_REQUEST
+from starlette.responses import JSONResponse, Response
+from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from pydantic import EmailStr
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.responses import Response
-
+from fastapi.encoders import jsonable_encoder
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token, get_current_user_authorizer
 from crud.user import create_user, check_free_email, get_user
-from models.user import User, UserInCreate, UserInResponse
+from models.user import User, UserBase, UserInCreate, UserInResponse
 from models.token import TokenResponse
 
 router = APIRouter()
@@ -29,11 +28,11 @@ async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailSt
     with open(f"./static/images/{name_of_file}.png", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    user = UserInCreate(password = password, username = username, email= email, image=f"localhost:8080/static/images/{name_of_file}")
+    user = UserInCreate(password = password, username = username, email= email, image=f"localhost:8080/static/images/{name_of_file}.png")
 
     dbuser = await create_user(db, user)
 
-    token = create_access_token(data = {"id" : dbuser._id} )
+    token = create_access_token(data = {"username" : dbuser.username} )
 
     return UserInResponse(user=User(**dbuser.dict(), token=token))
 
@@ -51,12 +50,10 @@ async def login(user: OAuth2PasswordRequestForm = Depends(), db: AsyncIOMotorCli
     if not dbuser or not dbuser.check_password(user.password):
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Wrong username / password!")
     
-    print(dbuser)
-    token = create_access_token(data = {"_id" : dbuser._id}) # cant do dbuser._id 
+    token = create_access_token(data = {"username" : dbuser.username})
 
     return TokenResponse(access_token = token)
 
-@router.get("/user", response_model=UserInResponse, tags=["Authentication"], name="Get current user")
+@router.get("/user", response_model=UserBase, tags=["Authentication"], name="Get current user")
 async def retrieve_user(user: User = Depends(get_current_user_authorizer())):
-    print(user)
-    return UserInResponse(user = user)
+    return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(user) )
