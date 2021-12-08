@@ -52,7 +52,7 @@ async def login(user: OAuth2PasswordRequestForm = Depends(), db: AsyncIOMotorCli
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Wrong username / password!")
     
     print(dbuser)
-    token = create_access_token(data = {"_id" : dbuser._id}) # cant do dbuser._id 
+    token = create_access_token(data = {"id" : dbuser.id}) 
 
     return TokenResponse(access_token = token)
 

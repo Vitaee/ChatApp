@@ -1,0 +1,13 @@
+fastapi
+starlette===0.16.0
+pydantic
+passlib
+databases
+motor
+uvicorn
+fastapi-contrib
+jaeger-client
+pydantic[email]
+python-multipart
+pymongo===3.12.0
+bson
