@@ -37,6 +37,7 @@ dependencies:
   flutter_bloc: ^8.0.0
   equatable: ^2.0.3
   formz: ^0.4.1
+  dio: ^4.0.4
   image_picker: ^0.8.4+4
 
 

@@ -1,10 +1,11 @@
-from pydantic import BaseModel, UUID1, EmailStr, HttpUrl, Field
-from models.common import IDModel, CreatedAtModel, UpdatedAtModel, PyObjectId
+from pydantic import BaseModel, EmailStr, Field
+from models.common import CreatedAtModel, UpdatedAtModel
 from typing import List, Optional
 from datetime import datetime
-from fastapi import UploadFile , File
 
 from common.security import verify_password
+from common.mongoIdObject import PyObjectId
+
 
 class UserBase(BaseModel):
     username : str
@@ -15,7 +16,7 @@ class User(BaseModel):
     token : str
 
 class UserInDB(UserBase):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id : PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     salt: str = ""
     hashed_password : str = ""
 
@@ -31,5 +32,5 @@ class UserInDB(UserBase):
 class UserInResponse(BaseModel):
     user: User
 
-class UserInCreate(UserBase, IDModel, CreatedAtModel, UpdatedAtModel):
+class UserInCreate(UserBase, CreatedAtModel, UpdatedAtModel):
     password: str

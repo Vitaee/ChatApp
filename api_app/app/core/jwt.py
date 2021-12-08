@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional
+from fastapi.param_functions import Body
 import jwt
 from fastapi import Depends, Header
 from jwt import PyJWTError
@@ -10,7 +11,7 @@ from fastapi.security import OAuth2PasswordBearer
 from crud.user import get_user
 from db.mongosdb import AsyncIOMotorClient, get_database
 from models.token import TokenPayload
-from models.user import User
+from models.user import UserBase
 from core.config import JWT_TOKEN_PREFIX, SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
 
 ALGORITHM = "HS256"
@@ -26,7 +27,7 @@ def auth_token( Authorization: str = Header(...)) -> str:
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
-async def get_current_user(db: AsyncIOMotorClient = Depends(get_database), token: str = Depends(oauth2_scheme)) -> User:
+async def get_current_user(db: AsyncIOMotorClient = Depends(get_database), token: str = "") -> UserBase:
     try:
         payload = jwt.decode(token , str(SECRET_KEY), algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)
@@ -35,14 +36,12 @@ async def get_current_user(db: AsyncIOMotorClient = Depends(get_database), token
         
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Invalid authorization information!")
     
-    print(token_data)
-    print(token_data.id)
-    dbuser = await get_user(db, field = "_id" , value = token_data.id)
+    dbuser = await get_user(db, field = "username" , value = token_data.username)
 
     if not dbuser:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="User doest not exist!")
 
-    user = User(**dbuser.dict(), token = token)
+    user = UserBase(**dbuser.dict())
     return user 
 
 def get_current_user_authorizer(*, required: bool = True):
@@ -50,11 +49,6 @@ def get_current_user_authorizer(*, required: bool = True):
         return get_current_user
 
 def create_access_token(*, data: dict, expires_delta: Optional[timedelta] = None):
-    print()
-    print("acces token func")
-    print(data)
-    print()
-    
     to_encode = data.copy()
 
     if expires_delta:
