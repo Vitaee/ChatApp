@@ -117,7 +117,8 @@ class LoginButton extends StatelessWidget {
             disabledColor: Colors.blueAccent.withOpacity(0.6),
             color: Colors.blueAccent,
             onPressed: state.status.isValidated
-                ? () => context.read<LoginCubit>().logInWithCredentials()
+                ? () => context.read<LoginCubit>().logInWithCredentials(
+                    state.email.value, state.password.value)
                 : null,
           ),
         );

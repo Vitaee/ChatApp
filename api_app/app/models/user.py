@@ -32,5 +32,10 @@ class UserInDB(UserBase):
 class UserInResponse(BaseModel):
     user: User
 
+class UserInRequest(BaseModel):
+    username: str
+    password: str
+
+    
 class UserInCreate(UserBase, CreatedAtModel, UpdatedAtModel):
     password: str

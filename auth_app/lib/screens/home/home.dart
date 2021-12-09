@@ -8,13 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScaffold extends StatelessWidget {
-  const HomeScaffold({Key? key}) : super(key: key);
+  //late final Future<User> myFuture = currentUser();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
         title: Text('Home'),
         actions: <Widget>[
           IconButton(

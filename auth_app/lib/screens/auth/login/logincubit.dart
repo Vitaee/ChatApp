@@ -1,7 +1,10 @@
+import 'package:auth_app/models/token.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:auth_app/screens/auth/models/email.dart';
 import 'package:auth_app/screens/auth/models/password.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'loginstate.dart';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -23,16 +26,28 @@ class LoginCubit extends Cubit<LoginState> {
     ));
   }
 
-  Future<void> logInWithCredentials() async {
-    if (!state.status.isValidated) return;
+  Future<Token> logInWithCredentials(String email, String password) async {
+    if (!state.status.isValidated) return Token(token: "");
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
-
+    final Dio dio = Dio();
     try {
-      await Future.delayed(const Duration(milliseconds: 500));
+      //await Future.delayed(const Duration(milliseconds: 500));
+
+      Response response = await dio.post("http://10.0.2.2:8080/api/user/login",
+          data: {"username": email, "password": password});
+
+      Token data = Token.fromJson(response.data);
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      prefs.setString("jwt", data.token.toString());
+
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
+      return data;
     } on Exception catch (e) {
       emit(state.copyWith(
           status: FormzStatus.submissionFailure, errorMessage: e.toString()));
+      return Token(token: "error");
     }
   }
 }

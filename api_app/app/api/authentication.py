@@ -9,7 +9,7 @@ from fastapi.encoders import jsonable_encoder
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token, get_current_user_authorizer
 from crud.user import create_user, check_free_email, get_user
-from models.user import User, UserBase, UserInCreate, UserInResponse
+from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse
 from models.token import TokenResponse
 
 router = APIRouter()
@@ -38,20 +38,21 @@ async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailSt
 
 
 @router.post("/user/login", response_model=TokenResponse, tags=["Authentication"], name="Email / username login")
-async def login(user: OAuth2PasswordRequestForm = Depends(), db: AsyncIOMotorClient = Depends(get_database) ):
-    if '@' in user.username:
+async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depends(get_database) ):
+    print(data)
+    if '@' in data.username:
         field = "email"
     else: 
         field = "username"
 
     
-    dbuser = await get_user(db, field = field, value = user.username )
+    dbuser = await get_user(db, field = field, value = data.username )
 
-    if not dbuser or not dbuser.check_password(user.password):
+    if not dbuser or not dbuser.check_password(data.password):
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Wrong username / password!")
     
     token = create_access_token(data = {"username" : dbuser.username})
-    return TokenResponse(access_token = token)
+    return JSONResponse(status_code=HTTP_200_OK, content= jsonable_encoder( { "token":token} ))
 
 @router.get("/user", response_model=UserBase, tags=["Authentication"], name="Get current user")
 async def retrieve_user(user: User = Depends(get_current_user_authorizer())):
