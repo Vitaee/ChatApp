@@ -34,7 +34,7 @@ async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailSt
 
     token = create_access_token(data = {"username" : dbuser.username} )
 
-    return UserInResponse(user=User(**dbuser.dict(), token=token))
+    return JSONResponse(status_code = HTTP_200_OK, content = jsonable_encoder({"token":token}) )
 
 
 @router.post("/user/login", response_model=TokenResponse, tags=["Authentication"], name="Email / username login")

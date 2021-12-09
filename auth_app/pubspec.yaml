@@ -39,6 +39,7 @@ dependencies:
   formz: ^0.4.1
   dio: ^4.0.4
   image_picker: ^0.8.4+4
+  shared_preferences: ^2.0.9
 
 
 

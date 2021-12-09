@@ -1,18 +1,15 @@
 class Token {
-  late String accessToken;
-  late String tokenType;
+  String? token;
 
-  Token({required this.accessToken, required this.tokenType});
+  Token({this.token});
 
   Token.fromJson(Map<String, dynamic> json) {
-    accessToken = json['access_token'];
-    tokenType = json['token_type'];
+    token = json['token'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['access_token'] = this.accessToken;
-    data['token_type'] = this.tokenType;
+    data['token'] = this.token;
     return data;
   }
 }

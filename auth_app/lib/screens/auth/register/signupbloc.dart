@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, override_on_non_overriding_member
 
 import 'dart:async';
+import 'dart:io';
 import 'package:auth_app/models/token.dart';
 import 'package:auth_app/screens/auth/register/signupevent.dart';
 import 'package:bloc/bloc.dart';
@@ -10,6 +11,7 @@ import 'package:auth_app/screens/auth/models/password.dart';
 import 'package:auth_app/screens/auth/models/confirm_password.dart';
 import 'package:formz/formz.dart';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'signupstate.dart';
 
 class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
@@ -77,28 +79,32 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     ));
   }
 
-  Future<Token> signUpInWithCredentials() async {
-    // should get fields as params.
-    if (!state.status.isValidated) Token(accessToken: "", tokenType: "");
+  Future<Token> signUpInWithCredentials(
+      String email, String password, String username, File image) async {
+    if (!state.status.isValidated) return Token(token: "");
     emit(state.copyWith(status: FormzStatus.submissionInProgress));
     final Dio dio = Dio();
     try {
-      //await Future.delayed(const Duration(milliseconds: 500));
+      FormData form_data = FormData.fromMap(
+          {"email": email, "password": password, "username": username});
 
-      Response response = await dio.post('/api/user/register', data: {
-        'username': "can",
-        'email': 'wendu',
-        'password': '1234',
-        'image': 'image_path'
-      });
+      form_data.files
+          .add(MapEntry("file", await MultipartFile.fromFile(image.path)));
 
-      Token token = Token.fromJson(response.data);
+      Response response = await dio
+          .post("http://10.0.2.2:8080/api/user/register", data: form_data);
+
+      Token data = Token.fromJson(response.data);
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      prefs.setString("jwt", data.token.toString());
 
       emit(state.copyWith(status: FormzStatus.submissionSuccess));
-      return token;
+      return data;
     } on Exception catch (e) {
       emit(state.copyWith(status: FormzStatus.submissionFailure));
-      return Token(accessToken: "error", tokenType: "error");
+      return Token(token: "error");
     }
   }
 }

@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, use_key_in_widget_constructors
 
+import 'dart:io';
+
 import 'package:auth_app/screens/auth/models/confirm_password.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ class SignUpForm extends StatelessWidget {
     return BlocListener<SignUpBloc, SignUpState>(
         listener: (context, state) {
           if (state.status.isSubmissionFailure) {
-            print('submission failure');
+            print('INFO: Submission failure in registration.');
           } else if (state.status.isSubmissionSuccess) {
             Navigator.of(context).pushNamed('/home');
           }
@@ -187,7 +189,11 @@ class SignUpButton extends StatelessWidget {
             disabledColor: Colors.blueAccent.withOpacity(0.6),
             color: Colors.blueAccent,
             onPressed: state.status.isValidated
-                ? () => context.read<SignUpBloc>().signUpInWithCredentials()
+                ? () => context.read<SignUpBloc>().signUpInWithCredentials(
+                    state.email.value,
+                    state.password.value,
+                    state.name.value,
+                    File(state.image.toString()))
                 : () => null,
           ),
         );
