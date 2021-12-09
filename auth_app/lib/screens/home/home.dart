@@ -2,7 +2,9 @@
 
 import 'dart:convert';
 
+import 'package:auth_app/main.dart';
 import 'package:auth_app/models/user.dart';
+import 'package:auth_app/screens/auth/login/signin.dart';
 import 'package:auth_app/screens/home/currentuser.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,14 +31,15 @@ class HomeScaffold extends StatelessWidget {
           )
         ],
       ),
-      body: FutureBuilder<User>(
+      body: FutureBuilder<User?>(
         future: currentUser(),
-        builder: (context, snapshot) {
+        builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasError) {
             return Text(
               'There was an error :(',
             );
           } else if (snapshot.hasData) {
+            print(snapshot.data);
             return SafeArea(
               child: Center(
                 child: Text(
@@ -45,7 +48,12 @@ class HomeScaffold extends StatelessWidget {
               ),
             );
           } else {
-            return CircularProgressIndicator();
+            return Center(
+              child: ElevatedButton(
+                child: Text("Re-Login"),
+                onPressed: () => Navigator.pushNamed(context, '/'),
+              ),
+            );
           }
         },
       ),

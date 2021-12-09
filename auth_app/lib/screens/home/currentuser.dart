@@ -2,7 +2,7 @@ import 'package:auth_app/models/user.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<User> currentUser() async {
+Future<User?> currentUser() async {
   final Dio dio = Dio();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   try {
@@ -13,10 +13,8 @@ Future<User> currentUser() async {
 
     User data = User.fromJson(response.data);
 
-    print(data);
-
     return data;
   } on Exception catch (e) {
-    return User();
+    return null;
   }
 }

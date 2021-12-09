@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     if (jwt.isEmpty) {
       return null;
     } else {
-      return "true";
+      return "gotJWT";
     }
   }
 
@@ -28,8 +28,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
       future: checkPrefs(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
+      builder: (context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.hasData && !snapshot.hasError) {
           return MaterialApp(
             title: "Chat App",
             debugShowCheckedModeBanner: false,
@@ -44,22 +44,7 @@ class MyApp extends StatelessWidget {
             initialRoute: '/home',
           );
         } else {
-          print("login page..");
-          print(snapshot.data);
-          print("login page finished..");
-          return MaterialApp(
-            title: "Chat App",
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-            routes: {
-              '/': (context) => LoginScaffold(),
-              '/signUp': (context) => SignUpScaffold(),
-              '/home': (context) => HomeScaffold(),
-            },
-            initialRoute: '/',
-          );
+          return CircularProgressIndicator();
         }
       },
     );
