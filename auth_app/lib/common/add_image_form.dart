@@ -32,7 +32,10 @@ class AddImageForm extends StatelessWidget {
               imagePath == "null" ? placeHolder : ImageWidget(image: imagePath),
         ),
         SizedBox(height: 5),
-        Text("Add profile image"),
+        Text(
+          "Add profile image",
+          style: TextStyle(color: Colors.white),
+        ),
       ],
     );
   }

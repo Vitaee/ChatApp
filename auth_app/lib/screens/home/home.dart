@@ -1,17 +1,12 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:convert';
-
-import 'package:auth_app/main.dart';
 import 'package:auth_app/models/user.dart';
-import 'package:auth_app/screens/auth/login/signin.dart';
 import 'package:auth_app/screens/home/currentuser.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScaffold extends StatelessWidget {
   //late final Future<User> myFuture = currentUser();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,8 +30,13 @@ class HomeScaffold extends StatelessWidget {
         future: currentUser(),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasError) {
-            return Text(
-              'There was an error :(',
+            return Center(
+              child: ElevatedButton(
+                child: Text(
+                  'Error :(',
+                ),
+                onPressed: () => Navigator.pushNamed(context, '/'),
+              ),
             );
           } else if (snapshot.hasData) {
             print(snapshot.data);

@@ -21,16 +21,30 @@ class LoginForm extends StatelessWidget {
       },
       builder: (context, state) => Stack(
         children: <Widget>[
+          Container(
+            //height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage("./assets/login_bg.png"),
+                  fit: BoxFit.cover),
+            ),
+          ),
           Positioned.fill(
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(38.0, 0, 38.0, 8),
+              padding: EdgeInsets.fromLTRB(38.0, 140, 38.0, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   WelcomeText(),
                   EmailInput(),
+                  Divider(
+                    height: 35,
+                  ),
                   PasswordInput(),
+                  Divider(
+                    height: 35,
+                  ),
                   LoginButton(),
                   SignUpButton()
                 ],
@@ -51,9 +65,9 @@ class WelcomeText extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 30.0, top: 30.0),
       child: Text(
-        'Welcome to Bloc tutorial!',
-        textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        'Welcome!',
+        textAlign: TextAlign.left,
+        style: TextStyle(color: Colors.white, fontSize: 33),
       ),
     );
   }
@@ -70,8 +84,8 @@ class EmailInput extends StatelessWidget {
           onChanged: (email) => context.read<LoginCubit>().emailChanged(email),
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
-            labelText: 'email',
-            helperText: '',
+            labelText: 'Email',
+            labelStyle: TextStyle(color: Colors.black),
             errorText: state.email.invalid ? 'invalid email' : null,
           ),
         );
@@ -91,8 +105,8 @@ class PasswordInput extends StatelessWidget {
               context.read<LoginCubit>().passwordChanged(password),
           obscureText: true,
           decoration: InputDecoration(
-            labelText: 'password',
-            helperText: '',
+            labelText: 'Password',
+            labelStyle: TextStyle(color: Colors.black),
             errorText: state.password.invalid ? 'invalid password' : null,
           ),
         );
@@ -114,8 +128,8 @@ class LoginButton extends StatelessWidget {
           child: CupertinoButton(
             padding: EdgeInsets.zero,
             child: Text('Login'),
-            disabledColor: Colors.blueAccent.withOpacity(0.6),
-            color: Colors.blueAccent,
+            disabledColor: Color(0xff4c505b).withOpacity(0.65),
+            color: Color(0xff4c505b),
             onPressed: state.status.isValidated
                 ? () => context.read<LoginCubit>().logInWithCredentials(
                     state.email.value, state.password.value)
@@ -143,7 +157,7 @@ class SignUpButton extends StatelessWidget {
               'Sign Up',
               style: TextStyle(color: Colors.black),
             ),
-            color: Colors.transparent, // add signup function
+            color: Colors.transparent,
             onPressed: () => Navigator.pushNamed(context, '/signUp'),
           ),
         );

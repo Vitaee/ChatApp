@@ -10,16 +10,12 @@ class SignUpScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Sign Up'),
-          elevation: 0,
-        ),
         body: SafeArea(
-          top: false,
-          child: BlocProvider(
-            create: (_) => SignUpBloc(),
-            child: SignUpForm(),
-          ),
-        ));
+      top: true,
+      child: BlocProvider(
+        create: (_) => SignUpBloc(),
+        child: SignUpForm(),
+      ),
+    ));
   }
 }

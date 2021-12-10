@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 import 'package:auth_app/screens/auth/login/signin.dart';
 import 'package:auth_app/screens/auth/register/signup.dart';
-import 'package:auth_app/screens/home/currentuser.dart';
 import 'package:auth_app/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';

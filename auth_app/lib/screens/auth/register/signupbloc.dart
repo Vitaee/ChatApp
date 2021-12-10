@@ -68,8 +68,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     );
     print('confirm is valid ${confirmedPassword.valid}');
     emit(state.copyWith(
-      confirmPassword:
-          confirmedPassword.valid ? confirmedPassword : ConfirmPassword.pure(),
+      confirmPassword: confirmedPassword.valid ? confirmedPassword : null,
       status: Formz.validate([
         state.name,
         state.email,
