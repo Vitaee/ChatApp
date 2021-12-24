@@ -14,7 +14,6 @@ from api import router as api_router
 
 
 
-
 app = FastAPI(title=PROJECT_NAME, debug=DEBUG, version=VERSION)
 app.add_middleware(
     CORSMiddleware,
@@ -39,6 +38,7 @@ app.include_router(api_router, prefix=API_PREFIX)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+
 if __name__ == '__main__':
     uvicorn.run(
         "main:app",
@@ -47,4 +47,3 @@ if __name__ == '__main__':
         reload=True,
         workers=1
     )
-

@@ -6,6 +6,7 @@ from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from pydantic import EmailStr
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.encoders import jsonable_encoder
+from core.auth_bearer import JwtBearer
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token, get_current_user_authorizer
 from crud.user import create_user, check_free_email, get_user
@@ -54,6 +55,7 @@ async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depend
     token = create_access_token(data = {"username" : dbuser.username})
     return JSONResponse(status_code=HTTP_200_OK, content= jsonable_encoder( { "token":token} ))
 
-@router.get("/user", response_model=UserBase, tags=["Authentication"], name="Get current user")
-async def retrieve_user(user: User = Depends(get_current_user_authorizer())):
-    return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(user) )
+@router.get("/user", response_model=UserBase, tags=["Authentication"], dependencies=[Depends(JwtBearer())], name="Get current user")
+async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_username: User = Depends(JwtBearer())):
+    current_user =  await get_user(db, field="username", value=current_username) 
+    return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(current_user))

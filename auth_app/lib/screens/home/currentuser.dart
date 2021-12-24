@@ -8,8 +8,10 @@ Future<User?> currentUser() async {
   try {
     String? jwt = prefs.getString("jwt");
 
-    Response response = await dio
-        .get("http://10.0.2.2:8080/api/user/", queryParameters: {"token": jwt});
+    dio.options.headers["Authorization"] = "Bearer ${jwt}";
+
+    Response response =
+        await dio.get("http://10.0.2.2:8080/api/user/"); //{"value": jwt});
 
     User data = User.fromJson(response.data);
 

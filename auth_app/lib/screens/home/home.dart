@@ -29,12 +29,10 @@ class HomeScaffold extends StatelessWidget {
       body: FutureBuilder<User?>(
         future: currentUser(),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasError) {
+          if (snapshot.hasError || !snapshot.hasData) {
             return Center(
               child: ElevatedButton(
-                child: Text(
-                  'Error :(',
-                ),
+                child: Text("Re-Login"),
                 onPressed: () => Navigator.pushNamed(context, '/'),
               ),
             );
@@ -48,12 +46,7 @@ class HomeScaffold extends StatelessWidget {
               ),
             );
           } else {
-            return Center(
-              child: ElevatedButton(
-                child: Text("Re-Login"),
-                onPressed: () => Navigator.pushNamed(context, '/'),
-              ),
-            );
+            return CircularProgressIndicator();
           }
         },
       ),

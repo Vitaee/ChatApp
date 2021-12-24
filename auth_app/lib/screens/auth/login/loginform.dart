@@ -31,19 +31,25 @@ class LoginForm extends StatelessWidget {
           ),
           Positioned.fill(
             child: SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(38.0, 140, 38.0, 8),
+              padding: EdgeInsets.fromLTRB(38.0, 150, 38.0, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   WelcomeText(),
+                  Divider(
+                    height: 50,
+                    thickness: 0.01,
+                  ),
                   EmailInput(),
                   Divider(
-                    height: 35,
+                    height: 30,
+                    thickness: 0.01,
                   ),
                   PasswordInput(),
                   Divider(
-                    height: 35,
+                    height: 50,
+                    thickness: 0.01,
                   ),
                   LoginButton(),
                   SignUpButton()
@@ -85,7 +91,7 @@ class EmailInput extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             labelText: 'Email',
-            labelStyle: TextStyle(color: Colors.black),
+            labelStyle: TextStyle(color: Colors.black, fontSize: 17),
             errorText: state.email.invalid ? 'invalid email' : null,
           ),
         );
@@ -106,7 +112,7 @@ class PasswordInput extends StatelessWidget {
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Password',
-            labelStyle: TextStyle(color: Colors.black),
+            labelStyle: TextStyle(color: Colors.black, fontSize: 17),
             errorText: state.password.invalid ? 'invalid password' : null,
           ),
         );

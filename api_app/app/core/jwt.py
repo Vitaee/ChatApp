@@ -25,7 +25,6 @@ def auth_token( Authorization: str = Header(...)) -> str:
 
     return token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/user/login")
 
 async def get_current_user(db: AsyncIOMotorClient = Depends(get_database), token: str = "") -> UserBase:
     try:

@@ -1,3 +1,4 @@
+from bson.objectid import ObjectId
 from pydantic import BaseModel, EmailStr, Field
 from models.common import CreatedAtModel, UpdatedAtModel
 from typing import List, Optional
@@ -23,6 +24,10 @@ class UserInDB(UserBase):
     updatedAt: Optional[datetime]
     createdAt: datetime
 
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
     
 
     def check_password(self, password:str):
