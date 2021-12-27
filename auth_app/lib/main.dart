@@ -33,8 +33,10 @@ class MyApp extends StatelessWidget {
             title: "Chat App",
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
+                scaffoldBackgroundColor: Colors.black,
+                colorScheme: ColorScheme.dark(),
+                appBarTheme: AppBarTheme(backgroundColor: Colors.black)),
+            darkTheme: ThemeData.dark(),
             routes: {
               '/': (context) => LoginScaffold(),
               '/signUp': (context) => SignUpScaffold(),

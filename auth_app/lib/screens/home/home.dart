@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:auth_app/models/user.dart';
+import 'package:auth_app/screens/home/chatui.dart';
 import 'package:auth_app/screens/home/currentuser.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +11,7 @@ class HomeScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         title: Text('Home'),
         actions: <Widget>[
           IconButton(
@@ -25,7 +26,7 @@ class HomeScaffold extends StatelessWidget {
             },
           )
         ],
-      ),
+      ),*/
       body: FutureBuilder<User?>(
         future: currentUser(),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
@@ -38,13 +39,14 @@ class HomeScaffold extends StatelessWidget {
             );
           } else if (snapshot.hasData) {
             print(snapshot.data);
-            return SafeArea(
+            return ChatScreen();
+            /*return SafeArea(
               child: Center(
                 child: Text(
                   "Hello ${snapshot.data!.username} welcome!",
                 ),
               ),
-            );
+            );*/
           } else {
             return CircularProgressIndicator();
           }
