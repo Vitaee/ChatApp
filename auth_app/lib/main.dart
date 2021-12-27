@@ -15,7 +15,6 @@ class MyApp extends StatelessWidget {
   Future<String?> checkPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jwt = prefs.getString("jwt").toString();
-    print(jwt);
     if (jwt.isEmpty) {
       return null;
     } else {
@@ -28,13 +27,13 @@ class MyApp extends StatelessWidget {
     return FutureBuilder<String?>(
       future: checkPrefs(),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData && !snapshot.hasError) {
+        if (snapshot.hasData) {
           return MaterialApp(
             title: "Chat App",
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
                 scaffoldBackgroundColor: Colors.black,
-                colorScheme: ColorScheme.dark(),
+                //colorScheme: ColorScheme.dark(),
                 appBarTheme: AppBarTheme(backgroundColor: Colors.black)),
             darkTheme: ThemeData.dark(),
             routes: {

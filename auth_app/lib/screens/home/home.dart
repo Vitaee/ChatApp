@@ -38,7 +38,6 @@ class HomeScaffold extends StatelessWidget {
               ),
             );
           } else if (snapshot.hasData) {
-            print(snapshot.data);
             return ChatScreen();
             /*return SafeArea(
               child: Center(

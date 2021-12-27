@@ -2,6 +2,7 @@ import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/screens/home/pages/messagepage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatScreen extends StatelessWidget {
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
@@ -33,8 +34,10 @@ class ChatScreen extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: InkWell(
             child: Icon(Icons.arrow_back, size: 20),
-            onTap: () {
-              Navigator.pushNamed(context, "/home");
+            onTap: () async {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.remove("jwt");
+              Navigator.pushNamed(context, '/');
             },
           ),
         ),
