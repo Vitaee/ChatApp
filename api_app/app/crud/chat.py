@@ -1,15 +1,19 @@
+import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.param_functions import Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from api.authentication import get_user
 from typing import List
+from models.room import RoomInDB
 from db.mongosdb import get_database
+from common.mongoIdObject import PyObjectId
+from fastapi.encoders import jsonable_encoder
 
 class SocketManager:
     def __init__(self):
         self.active_connections: List[(WebSocket, str)] = []
 
-    async def connect(self, websocket: WebSocket, user: str):
+    async def connect(self, websocket: WebSocket, room:str, user: str):
         await websocket.accept()
         self.active_connections.append((websocket, user))
 
@@ -25,39 +29,45 @@ class SocketManager:
 
 manager = SocketManager()
 
-async def insert_room(username, room_name, collection):
+async def insert_room(db: AsyncIOMotorClient, username, room_name):
     "insert room for both users."
-    db: AsyncIOMotorClient = Depends(get_database)
     room = {}
     room["room_name"] = room_name
     user = await get_user(db, field="username", value=username) 
-    room["members"] = user if user is not None else ""
-
+    room["members"] = [  user.username ] if user is not None else ""
+    
     dbroom = RoomInDB(**room)
 
-    response = db["rooms"].insert_one(dbroom.dict())
+    response = await db["chat-app"]["rooms"].insert_one(dbroom.dict())
+    return response.inserted_id
 
-    res = db["rooms"].find_one( {"_id":response.inserted_id} )
-    res["_id"] = str(res["_id"])
-
-    return res
-
-async def get_rooms(username: str = None):
+async def get_rooms(db: AsyncIOMotorClient, username: str = None):
     "get rooms of user has"
-    db: AsyncIOMotorClient = Depends(get_database)
-    collection = db["rooms"]
+    collection = await db["chat-app"]["rooms"]
 
-    rows = collection.find( {"created_by":username} )
+    rows = await collection.find( {"created_by":username} )
 
     return rows
 
-async def get_room(room_name : str = None):
+async def get_room(db: AsyncIOMotorClient, room_name : str = None):
     "get room of current user & other user"
-    db: AsyncIOMotorClient = Depends(get_database)
-    row = db["rooms"].find_one( {"room_name":room_name} )
+    row = await db["chat-app"]["rooms"].find_one( {"room_name":room_name} )
 
     if row is not None:
         return row
     else:
         return None
 
+async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
+    message_data = json.loads(data) 
+
+    try:
+        room = await get_room(message_data["room_name"])
+        user = await get_user(field="username", value = message_data["user"]["username"])
+        message_data["user"] = user
+        message_data.pop("room_name", None)
+        await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"messages":message_data}} )
+        return True
+
+    except Exception as e:
+        return False
