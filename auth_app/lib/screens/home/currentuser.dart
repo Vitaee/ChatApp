@@ -17,6 +17,7 @@ Future<User?> currentUser() async {
 
     return data;
   } on Exception catch (e) {
+    print("$e");
     return null;
   }
 }

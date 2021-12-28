@@ -4,7 +4,6 @@ import 'package:auth_app/models/user.dart';
 import 'package:auth_app/screens/home/chatui.dart';
 import 'package:auth_app/screens/home/currentuser.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScaffold extends StatelessWidget {
   //late final Future<User> myFuture = currentUser();

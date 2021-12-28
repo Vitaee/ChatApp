@@ -1,4 +1,6 @@
 import 'package:auth_app/common/avatar.dart';
+import 'package:auth_app/models/message_data.dart';
+import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:flutter/material.dart';
 
 class MessagesPage extends StatefulWidget {
@@ -19,7 +21,16 @@ class _MessagesPageState extends State<MessagesPage> {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              return _MessageTile();
+              return _MessageTile(
+                messageData: MessageData(
+                  senderName: "Can",
+                  message: "hello! how are you?",
+                  messageDate: "17/2/2021",
+                  dateMessage: "12/2/2021",
+                  profilePicture:
+                      "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
+                ),
+              );
             },
             childCount: 4,
           ),
@@ -32,13 +43,16 @@ class _MessagesPageState extends State<MessagesPage> {
 class _MessageTile extends StatelessWidget {
   const _MessageTile({
     Key? key,
+    required this.messageData,
   }) : super(key: key);
+
+  final MessageData messageData;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(context, '/home');
+        Navigator.of(context).push(ChatScreen.route(messageData));
       },
       child: Container(
         height: 100,
@@ -69,13 +83,13 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        "channelname",
+                        "Username",
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          letterSpacing: 0.2,
-                          wordSpacing: 1.5,
-                          fontWeight: FontWeight.w900,
-                        ),
+                            letterSpacing: 0.2,
+                            wordSpacing: 1.5,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white),
                       ),
                     ),
                     SizedBox(
@@ -98,7 +112,11 @@ class _MessageTile extends StatelessWidget {
                     const SizedBox(
                       height: 8,
                     ),
-                    Center(child: Text("2")),
+                    Center(
+                        child: Text(
+                      "2",
+                      style: TextStyle(color: Colors.white),
+                    )),
                   ],
                 ),
               ),
@@ -114,18 +132,18 @@ class _MessageTile extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 12,
-          color: Colors.red,
+          color: Colors.white,
         ));
   }
 
   Widget _buildLastMessageAt() {
     return Text(
-      "stringDate",
+      "12/21/2021",
       style: const TextStyle(
         fontSize: 11,
         letterSpacing: -0.2,
         fontWeight: FontWeight.w600,
-        color: Colors.red,
+        color: Colors.white,
       ),
     );
   }
@@ -139,6 +157,7 @@ class _Stories extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Card(
+        color: Colors.transparent,
         elevation: 0,
         child: SizedBox(
           height: 140,
@@ -152,7 +171,7 @@ class _Stories extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 15,
-                    color: Colors.red,
+                    color: Colors.white,
                   ),
                 ),
               ),

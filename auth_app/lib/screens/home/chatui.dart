@@ -96,6 +96,7 @@ class BottomBarState extends State<BottomBar> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Color(0xff3a434d),
       child: SafeArea(
         top: false,
         bottom: true,
@@ -157,14 +158,14 @@ class BottomBarItem extends StatelessWidget {
         onTap(index);
       },
       child: SizedBox(
-        width: 70,
+        width: 80,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
               size: 22,
-              color: isSelected ? Colors.red : null,
+              color: isSelected ? Color(0xfff4ac47) : null,
             ),
             const SizedBox(
               height: 8,
@@ -175,7 +176,7 @@ class BottomBarItem extends StatelessWidget {
                   ? const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                      color: Color(0xfff4ac47),
                     )
                   : const TextStyle(fontSize: 11),
             ),

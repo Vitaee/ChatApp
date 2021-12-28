@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 
 enum ConfirmedPasswordValidationError { invalid, mismatch }

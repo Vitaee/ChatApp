@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, override_on_non_overriding_member
+// ignore_for_file: prefer_const_constructors, override_on_non_overriding_member, invalid_use_of_visible_for_testing_member
 
 import 'dart:async';
 import 'dart:io';
@@ -103,7 +103,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       return data;
     } on Exception catch (e) {
       emit(state.copyWith(status: FormzStatus.submissionFailure));
-      return Token(token: "error");
+      return Token(token: "error $e");
     }
   }
 }
