@@ -34,7 +34,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     await manager.disconnect(websocket, room_name)
                     break
                 else:
-                    await upload_message_to_room(data)
+                    await upload_message_to_room(db,data)
                     await manager.broadcast(f"{data}")
             else:
                 await manager.connect(websocket, room_name)
@@ -45,4 +45,4 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         print(type(e).__name__, e.args)
         print()
 
-        await manager.disconnect(websocket, current_username)
+        manager.disconnect(websocket, current_username)

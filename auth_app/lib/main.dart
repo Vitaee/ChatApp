@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
             title: "Chat App",
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
-                scaffoldBackgroundColor: Color(0xff59bee6),
+                scaffoldBackgroundColor: Color(0xff3a434d),
                 //colorScheme: ColorScheme.dark(),
                 appBarTheme: AppBarTheme(backgroundColor: Color(0xff3a434d))),
             darkTheme: ThemeData.dark(),

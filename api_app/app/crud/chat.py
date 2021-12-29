@@ -58,16 +58,19 @@ async def get_room(db: AsyncIOMotorClient, room_name : str = None):
     else:
         return None
 
-async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
+async def upload_message_to_room(db:AsyncIOMotorClient, data:str) -> bool:
     message_data = json.loads(data) 
-
+    message_data = message_data[0]
+    
+    print(message_data["room_name"])
     try:
-        room = await get_room(message_data["room_name"])
-        user = await get_user(field="username", value = message_data["user"]["username"])
-        message_data["user"] = user
-        message_data.pop("room_name", None)
+        room = await get_room(message_data['room_name'])
+        user = await get_user(field="username", value = message_data['user'])
+        message_data['user'] = user
+        #message_data.pop("room_name", None)
         await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"messages":message_data}} )
         return True
 
     except Exception as e:
+        print("An error accured while uploading message to db  " ,e)
         return False

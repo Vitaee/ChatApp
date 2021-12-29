@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
 import 'package:auth_app/models/message_data.dart';
-import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -34,6 +32,7 @@ class ChatScreen extends StatelessWidget {
           child: InkWell(
               child: Icon(
                 CupertinoIcons.back,
+                size: 28,
               ),
               onTap: () {
                 Navigator.of(context).pop();
@@ -48,6 +47,7 @@ class ChatScreen extends StatelessWidget {
             child: Center(
               child: Icon(
                 CupertinoIcons.video_camera_solid,
+                size: 26,
                 //onTap: () {},
               ),
             ),
@@ -57,6 +57,7 @@ class ChatScreen extends StatelessWidget {
             child: Center(
               child: Icon(
                 CupertinoIcons.phone_solid,
+                size: 26,
                 //onTap: () {},
               ),
             ),
@@ -68,7 +69,7 @@ class ChatScreen extends StatelessWidget {
           Expanded(
             child: _DemoMessageList(),
           ),
-          _ActionBar(),
+          _ActionBottomBar(),
         ],
       ),
     );
@@ -139,7 +140,7 @@ class _MessageTile extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Color(0xff3a434d),
+                color: Color(0xff59bee6),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(_borderRadius),
                   topRight: Radius.circular(_borderRadius),
@@ -243,18 +244,18 @@ class _DateLable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32.0),
+        padding: EdgeInsets.symmetric(vertical: 32.0),
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12),
+            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 12),
             child: Text(
               lable,
-              style: const TextStyle(
-                fontSize: 12,
+              style: TextStyle(
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: Colors.red,
               ),
@@ -298,7 +299,7 @@ class _AppBarTitle extends StatelessWidget {
               const Text(
                 'Online now',
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: Color(0xff59bee6),
                 ),
@@ -311,8 +312,8 @@ class _AppBarTitle extends StatelessWidget {
   }
 }
 
-class _ActionBar extends StatelessWidget {
-  const _ActionBar({Key? key}) : super(key: key);
+class _ActionBottomBar extends StatelessWidget {
+  const _ActionBottomBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -331,9 +332,10 @@ class _ActionBar extends StatelessWidget {
               ),
             ),
             child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              padding: EdgeInsets.symmetric(horizontal: 14.0),
               child: Icon(
                 CupertinoIcons.camera_fill,
+                size: 28,
               ),
             ),
           ),
@@ -341,7 +343,7 @@ class _ActionBar extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.only(left: 16.0),
               child: TextField(
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 16),
                 decoration: InputDecoration(
                   hintText: 'Type something...',
                   border: InputBorder.none,
@@ -352,11 +354,12 @@ class _ActionBar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(
               left: 12,
-              right: 24.0,
+              right: 10.0,
+              bottom: 5,
             ),
             child: GlowingActionButton(
-              color: Colors.red, //Colors.accent,
-              icon: Icons.send_rounded,
+              color: Color(0xfff4ac47), //Colors.accent,
+              icon: Icons.send_sharp,
               onPressed: () {
                 print('TODO: send a message');
               },
