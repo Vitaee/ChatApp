@@ -42,7 +42,6 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
     except Exception as e:
         print()
         print("could not connect --> ", e)
-        print(type(e).__name__, e.args)
+        print(type(e).__name__, e.args, e.__repr__)
         print()
-
         manager.disconnect(websocket, current_username)
