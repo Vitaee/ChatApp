@@ -3,7 +3,7 @@
 import 'package:auth_app/models/user.dart';
 import 'package:auth_app/screens/auth/login/signin.dart';
 import 'package:auth_app/screens/home/chatui.dart';
-import 'package:auth_app/screens/home/currentuser.dart';
+import 'package:auth_app/services/currentuser.dart';
 import 'package:flutter/material.dart';
 
 class HomeScaffold extends StatelessWidget {
