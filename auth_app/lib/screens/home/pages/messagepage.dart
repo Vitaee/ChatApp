@@ -32,7 +32,7 @@ class _MessagesPageState extends State<MessagesPage> {
                 ),
               );
             },
-            childCount: 4,
+            childCount: 1,
           ),
         )
       ],
@@ -83,7 +83,7 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        "Username",
+                        messageData.senderName,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,

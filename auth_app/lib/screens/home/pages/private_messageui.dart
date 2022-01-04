@@ -1,8 +1,12 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatScreen extends StatelessWidget {
   static Route route(MessageData data) => MaterialPageRoute(
@@ -86,30 +90,8 @@ class _DemoMessageList extends StatelessWidget {
       child: ListView(
         children: const [
           _DateLable(lable: 'Yesterday'),
-          _MessageTile(
-            message: 'Hi, Lucy! How\'s your day going?',
-            messageDate: '12:01 PM',
-          ),
-          _MessageOwnTile(
-            message: 'You know how it goes...',
-            messageDate: '12:02 PM',
-          ),
-          _MessageTile(
-            message: 'Do you want Starbucks?',
-            messageDate: '12:02 PM',
-          ),
-          _MessageOwnTile(
-            message: 'Would be awesome!',
-            messageDate: '12:03 PM',
-          ),
-          _MessageTile(
-            message: 'Coming up!',
-            messageDate: '12:03 PM',
-          ),
-          _MessageOwnTile(
-            message: 'YAY!!!',
-            messageDate: '12:03 PM',
-          ),
+          _MessageOwnTile(message: "message", messageDate: "21:05 PM"),
+          _MessageTile(message: "message2", messageDate: "21:06 PM")
         ],
       ),
     );
@@ -309,6 +291,29 @@ class _AppBarTitle extends StatelessWidget {
         )
       ],
     );
+  }
+}
+
+class MessageSendBar extends StatefulWidget {
+  MessageSendBar(
+      {Key? key, required this.roomName, required this.currentUsername})
+      : super(key: key);
+
+  String roomName;
+  String currentUsername;
+
+  late IOWebSocketChannel channel = IOWebSocketChannel.connect(
+      "ws://10.0.2.2:8080/api/chat/$roomName/$currentUsername");
+
+  @override
+  _MessageSendBarState createState() => _MessageSendBarState();
+}
+
+class _MessageSendBarState extends State<MessageSendBar> {
+  TextEditingController text_controller = TextEditingController();
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
 
