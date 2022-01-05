@@ -36,10 +36,17 @@ async def insert_room(db: AsyncIOMotorClient, username, room_name):
     user = await get_user(db, field="username", value=username) 
     room["members"] = [  user.username ] if user is not None else ""
     
-    dbroom = RoomInDB(**room)
+    
+    check_room = await db["chat-app"]["rooms"].count_documents(  {"room_name": room_name}  )
 
-    response = await db["chat-app"]["rooms"].insert_one(dbroom.dict())
-    return response.inserted_id
+    if ( check_room > 0 ):
+        return ""
+    else: 
+        dbroom = RoomInDB(**room)
+        response = await db["chat-app"]["rooms"].insert_one(dbroom.dict())
+        return response.inserted_id
+    
+    
 
 async def get_rooms(db: AsyncIOMotorClient, username: str = None):
     "get rooms of user has"
@@ -58,9 +65,8 @@ async def get_room(db: AsyncIOMotorClient, room_name : str = None):
     else:
         return None
 
-async def upload_message_to_room(db:AsyncIOMotorClient, data:str) -> bool:
-    message_data = json.loads(data) 
-    message_data = message_data[0]
+async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
+    message_data = data[0]
     try:
         room = await get_room(db, message_data['room_name'])
         user = await get_user(db, field="username", value = message_data['user'])

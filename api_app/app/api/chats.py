@@ -34,14 +34,14 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     await manager.disconnect(websocket, room_name)
                     break
                 else:
-                    await upload_message_to_room(db,data)
-                    await manager.broadcast(f"{data}")
+                    await upload_message_to_room(db,message_data)
+                    await manager.broadcast(message_data)
             else:
                 await manager.connect(websocket, room_name)
 
     except Exception as e:
-        print()
-        print("could not connect --> ", e)
+        print("\n")
+        print("\tcould not connect --> ", e)
         print(type(e).__name__, e.args, e.__repr__)
         print()
         manager.disconnect(websocket, current_username)

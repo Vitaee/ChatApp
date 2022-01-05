@@ -23,11 +23,11 @@ class _MessagesPageState extends State<MessagesPage> {
             (context, index) {
               return _MessageTile(
                 messageData: MessageData(
-                  senderName: "Can",
-                  message: "hello! how are you?",
-                  messageDate: "17/2/2021",
-                  dateMessage: "12/2/2021",
-                  profilePicture:
+                  recvUsername: "sloon",
+                  lastMessage: "hello! how are you?",
+                  lastMessageDate: "17/2/2021",
+                  currentUser: "can",
+                  profilePic:
                       "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
                 ),
               );
@@ -71,9 +71,7 @@ class _MessageTile extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Avatar.medium(
-                    url:
-                        "https://t4.ftcdn.net/jpg/00/84/67/19/360_F_84671939_jxymoYZO8Oeacc3JRBDE8bSXBWj0ZfA9.jpg"),
+                child: Avatar.medium(url: messageData.profilePic),
               ),
               Expanded(
                 child: Column(
@@ -83,7 +81,7 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        messageData.senderName,
+                        messageData.recvUsername!,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,
@@ -128,7 +126,7 @@ class _MessageTile extends StatelessWidget {
   }
 
   Widget _buildLastMessage() {
-    return Text('Hello!',
+    return Text(messageData.lastMessage!,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 12,
@@ -138,7 +136,7 @@ class _MessageTile extends StatelessWidget {
 
   Widget _buildLastMessageAt() {
     return Text(
-      "12/21/2021",
+      messageData.lastMessageDate!,
       style: const TextStyle(
         fontSize: 11,
         letterSpacing: -0.2,

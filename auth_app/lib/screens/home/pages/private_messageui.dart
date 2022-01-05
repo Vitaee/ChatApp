@@ -68,15 +68,125 @@ class ChatScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: const [
-          Expanded(
-            child: _DemoMessageList(),
-          ),
-          _ActionBottomBar(),
-        ],
-      ),
+      body: MessageSendBar(
+          roomName: "${messageData.recvUsername},${messageData.currentUser}",
+          currentUsername: messageData.currentUser!),
     );
+  }
+}
+
+class MessageSendBar extends StatefulWidget {
+  MessageSendBar(
+      {Key? key, required this.roomName, required this.currentUsername})
+      : super(key: key);
+
+  String roomName;
+  String currentUsername;
+
+  late WebSocketChannel channel = IOWebSocketChannel.connect(
+      "ws://10.0.2.2:8080/api/chat/$roomName/$currentUsername");
+
+  @override
+  _MessageSendBarState createState() => _MessageSendBarState();
+}
+
+class _MessageSendBarState extends State<MessageSendBar> {
+  TextEditingController text_controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: ListView(
+              children: <Widget>[
+                _DateLable(lable: "Yestarday"),
+                StreamBuilder(
+                  stream: widget.channel.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return _MessageOwnTile(
+                          message: snapshot.data.toString(),
+                          messageDate: "21:05 PM");
+                    } else {
+                      return Divider(
+                        height: 1,
+                        thickness: 0.01,
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        SafeArea(
+          bottom: true,
+          top: false,
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    right: BorderSide(
+                      width: 2,
+                      color: Theme.of(context).dividerColor,
+                    ),
+                  ),
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14.0),
+                  child: Icon(
+                    CupertinoIcons.camera_fill,
+                    size: 28,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 16.0),
+                  child: TextField(
+                    controller: text_controller,
+                    style: TextStyle(fontSize: 16),
+                    decoration: InputDecoration(
+                      hintText: 'Type something...',
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 12,
+                  right: 10.0,
+                  bottom: 5,
+                ),
+                child: GlowingActionButton(
+                  color: Color(0xfff4ac47), //Colors.accent,
+                  icon: Icons.send_sharp,
+                  onPressed: sendData,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void sendData() {
+    if (text_controller.text.isNotEmpty) {
+      widget.channel.sink.add(
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.currentUsername}" }]');
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.channel.sink.close();
+    super.dispose();
   }
 }
 
@@ -262,7 +372,7 @@ class _AppBarTitle extends StatelessWidget {
     return Row(
       children: [
         Avatar.small(
-          url: messageData.profilePicture,
+          url: messageData.profilePic,
         ),
         const SizedBox(
           width: 16,
@@ -273,7 +383,7 @@ class _AppBarTitle extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                messageData.senderName,
+                messageData.recvUsername!,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 14),
               ),
@@ -291,29 +401,6 @@ class _AppBarTitle extends StatelessWidget {
         )
       ],
     );
-  }
-}
-
-class MessageSendBar extends StatefulWidget {
-  MessageSendBar(
-      {Key? key, required this.roomName, required this.currentUsername})
-      : super(key: key);
-
-  String roomName;
-  String currentUsername;
-
-  late IOWebSocketChannel channel = IOWebSocketChannel.connect(
-      "ws://10.0.2.2:8080/api/chat/$roomName/$currentUsername");
-
-  @override
-  _MessageSendBarState createState() => _MessageSendBarState();
-}
-
-class _MessageSendBarState extends State<MessageSendBar> {
-  TextEditingController text_controller = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    return Container();
   }
 }
 
