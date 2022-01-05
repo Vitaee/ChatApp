@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:convert';
+
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
 import 'package:auth_app/models/message_data.dart';
@@ -69,7 +71,7 @@ class ChatScreen extends StatelessWidget {
         ],
       ),
       body: MessageSendBar(
-          roomName: "${messageData.recvUsername},${messageData.currentUser}",
+          roomName: "${messageData.recvUsername}-${messageData.currentUser}",
           currentUsername: messageData.currentUser!),
     );
   }
@@ -105,15 +107,18 @@ class _MessageSendBarState extends State<MessageSendBar> {
                 _DateLable(lable: "Yestarday"),
                 StreamBuilder(
                   stream: widget.channel.stream,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+                  builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                    print(snapshot.data.runtimeType);
+                    var data = json.decode(snapshot.data.toString());
+                    if (data != null) {
+                      // error
                       return _MessageOwnTile(
-                          message: snapshot.data.toString(),
+                          message: data[0]["data"].toString(),
                           messageDate: "21:05 PM");
                     } else {
                       return Divider(
                         height: 1,
-                        thickness: 0.01,
+                        thickness: 0.1,
                       );
                     }
                   },
@@ -179,7 +184,9 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void sendData() {
     if (text_controller.text.isNotEmpty) {
       widget.channel.sink.add(
-          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.currentUsername}" }]');
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.currentUsername}", "target_user":"${widget.roomName.split('-')[0]}" }]');
+
+      text_controller.clear();
     }
   }
 

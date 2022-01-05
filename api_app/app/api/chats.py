@@ -15,10 +15,11 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         await insert_room(db, current_username, room_name)
         room = await get_room(db, room_name)
         data = {
-            "content": f"{current_username} has created the chat.",
+            "content": f"{current_username} has joined the chat.",
             "user": current_username,
             "room_name": room_name,
             "type":"entrance",
+            "data":"",
             "room_object": str(room['_id'])
         }
 
