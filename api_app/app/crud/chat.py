@@ -13,12 +13,12 @@ class SocketManager:
     def __init__(self):
         self.active_connections: List[(WebSocket, str)] = []
 
-    async def connect(self, websocket: WebSocket, room:str, user: str):
+    async def connect(self, websocket: WebSocket, room:str,):
         await websocket.accept()
-        self.active_connections.append((websocket, user))
+        self.active_connections.append((websocket,room))
 
-    def disconnect(self, websocket: WebSocket, user: str):
-        self.active_connections.remove((websocket, user))
+    def disconnect(self, websocket: WebSocket, room:str):
+        self.active_connections.remove((websocket, room))
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)

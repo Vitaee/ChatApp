@@ -1,17 +1,23 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI, Header
 from fastapi.encoders import jsonable_encoder
 from fastapi.param_functions import Depends
 from motor.motor_asyncio import AsyncIOMotorClient
+from starlette.requests import Request
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 from db.mongosdb import get_database
 from crud.chat import get_room, insert_room, manager, upload_message_to_room
 import json
 router = APIRouter()
 
-@router.websocket("/chat/{room_name}/{current_username}")
-async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, room_name: str = None, current_username: str = None):
+@router.websocket("/chat/{room_name}/")
+async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, room_name: str = None, current_user: str = Header(None)):
+    print()
+    print("\t", current_user ,"\n")
+    print()
+
+    current_username = current_user
     try:
-        await manager.connect(websocket, room_name, current_username)
+        await manager.connect(websocket, room_name)
         await insert_room(db, current_username, room_name)
         room = await get_room(db, room_name)
         data = {
@@ -45,4 +51,4 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         print("\tcould not connect --> ", e)
         print(type(e).__name__, e.args, e.__repr__)
         print()
-        manager.disconnect(websocket, current_username)
+        manager.disconnect(websocket, room_name)
