@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
 import 'package:auth_app/models/message_data.dart';
+import 'package:auth_app/models/private_messages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
@@ -27,66 +28,71 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: Theme.of(context).iconTheme,
-        centerTitle: false,
-        backgroundColor: Color(0xff3a434d),
-        elevation: 0,
-        leadingWidth: 54,
-        leading: Align(
-          alignment: Alignment.centerRight,
-          child: InkWell(
-              child: Icon(
-                CupertinoIcons.back,
-                size: 28,
-              ),
-              onTap: () {
-                Navigator.of(context).pop();
-              }),
-        ),
-        title: _AppBarTitle(
-          messageData: messageData,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Center(
-              child: Icon(
-                CupertinoIcons.video_camera_solid,
-                size: 26,
-                //onTap: () {},
+        appBar: AppBar(
+          iconTheme: Theme.of(context).iconTheme,
+          centerTitle: false,
+          backgroundColor: Color(0xff3a434d),
+          elevation: 0,
+          leadingWidth: 54,
+          leading: Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+                child: Icon(
+                  CupertinoIcons.back,
+                  size: 28,
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                }),
+          ),
+          title: _AppBarTitle(
+            messageData: messageData,
+          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Center(
+                child: Icon(
+                  CupertinoIcons.video_camera_solid,
+                  size: 26,
+                  //onTap: () {},
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Center(
-              child: Icon(
-                CupertinoIcons.phone_solid,
-                size: 26,
-                //onTap: () {},
+            Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: Center(
+                child: Icon(
+                  CupertinoIcons.phone_solid,
+                  size: 26,
+                  //onTap: () {},
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: MessageSendBar(
-          roomName: "${messageData.recvUsername}-${messageData.currentUser}",
-          currentUsername: messageData.currentUser!),
-    );
+          ],
+        ),
+        body: MessageSendBar(
+            //roomName: "${messageData.recvUsername}-${messageData.currentUser}",
+            roomName: "room1",
+            sourceUser: messageData.currentUser!,
+            targetUser: messageData.recvUsername));
   }
 }
 
 class MessageSendBar extends StatefulWidget {
   MessageSendBar(
-      {Key? key, required this.roomName, required this.currentUsername})
+      {Key? key,
+      required this.roomName,
+      required this.sourceUser,
+      required this.targetUser})
       : super(key: key);
 
   String roomName;
-  String currentUsername;
+  String sourceUser;
+  String? targetUser;
 
   late WebSocketChannel channel = IOWebSocketChannel.connect(
-      "ws://10.0.2.2:8080/api/chat/$roomName/$currentUsername");
+      "ws://10.80.1.165:8080/api/chat/$roomName/$sourceUser");
 
   @override
   _MessageSendBarState createState() => _MessageSendBarState();
@@ -94,7 +100,7 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
-
+  List<dynamic> messages = [];
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -102,28 +108,31 @@ class _MessageSendBarState extends State<MessageSendBar> {
         Expanded(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: ListView(
-              children: <Widget>[
-                _DateLable(lable: "Yestarday"),
-                StreamBuilder(
-                  stream: widget.channel.stream,
-                  builder: (context, AsyncSnapshot<dynamic> snapshot) {
-                    print(snapshot.data.runtimeType);
-                    var data = json.decode(snapshot.data.toString());
-                    if (data != null) {
-                      // error
-                      return _MessageOwnTile(
-                          message: data[0]["data"].toString(),
-                          messageDate: "21:05 PM");
-                    } else {
-                      return Divider(
-                        height: 1,
-                        thickness: 0.1,
-                      );
-                    }
-                  },
-                ),
-              ],
+            // _DateLable(lable: "Yestarday"),
+            child: StreamBuilder(
+              stream: widget.channel.stream,
+              builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.connectionState != ConnectionState.waiting) {
+                  return ListView.builder(
+                    itemBuilder: (context, index) {
+                      if (messages[index].user == widget.sourceUser) {
+                        return _MessageOwnTile(
+                            message: messages[index].data,
+                            messageDate: "21:05 PM");
+                      } else {
+                        return _MessageTile(
+                            message: messages[index].data,
+                            messageDate: "21:05 PM");
+                      }
+                    },
+                    itemCount: messages.length,
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
             ),
           ),
         ),
@@ -184,8 +193,16 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void sendData() {
     if (text_controller.text.isNotEmpty) {
       widget.channel.sink.add(
-          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.currentUsername}", "target_user":"${widget.roomName.split('-')[0]}" }]');
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}" }]');
 
+      DirectMessages message = DirectMessages(
+          type: "entrance",
+          data: text_controller.text,
+          room_name: widget.roomName,
+          user: widget.sourceUser,
+          target_user: widget.targetUser,
+          time: DateTime.now().toString().substring(10, 16));
+      messages.add(message);
       text_controller.clear();
     }
   }

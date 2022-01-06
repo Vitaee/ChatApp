@@ -48,7 +48,6 @@ async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depend
 
     
     dbuser = await get_user(db, field = field, value = data.username )
-
     if not dbuser or not dbuser.check_password(data.password):
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Wrong username / password!")
     

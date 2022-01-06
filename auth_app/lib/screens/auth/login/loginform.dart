@@ -91,7 +91,7 @@ class EmailInput extends StatelessWidget {
           keyboardType: TextInputType.emailAddress,
           decoration: InputDecoration(
             labelText: 'Email',
-            labelStyle: TextStyle(color: Colors.black, fontSize: 17),
+            labelStyle: TextStyle(color: Color(0xff0e0f0f), fontSize: 18),
             errorText: state.email.invalid ? 'invalid email' : null,
           ),
         );
@@ -112,7 +112,7 @@ class PasswordInput extends StatelessWidget {
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'Password',
-            labelStyle: TextStyle(color: Colors.black, fontSize: 17),
+            labelStyle: TextStyle(color: Color(0xff0e0f0f), fontSize: 18),
             errorText: state.password.invalid ? 'invalid password' : null,
           ),
         );

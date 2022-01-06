@@ -18,6 +18,8 @@ class HomeScaffold extends StatelessWidget {
             return LoginScaffold();
           } else if (snapshot.hasData) {
             return ChatScreen();
+          } else if (snapshot.data == null) {
+            return LoginScaffold();
           } else {
             return Center(child: CircularProgressIndicator());
           }

@@ -11,6 +11,24 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
+  List<dynamic> userChats = [
+    MessageData(
+      recvUsername: "sloon",
+      lastMessage: "hello! how are you?",
+      lastMessageDate: "17/2/2021",
+      currentUser: "can",
+      profilePic:
+          "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
+    ),
+    MessageData(
+      recvUsername: "can",
+      lastMessage: "hello!",
+      lastMessageDate: "17/2/2021",
+      currentUser: "sloon",
+      profilePic:
+          "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
+    ),
+  ];
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -21,18 +39,9 @@ class _MessagesPageState extends State<MessagesPage> {
         SliverList(
           delegate: SliverChildBuilderDelegate(
             (context, index) {
-              return _MessageTile(
-                messageData: MessageData(
-                  recvUsername: "sloon",
-                  lastMessage: "hello! how are you?",
-                  lastMessageDate: "17/2/2021",
-                  currentUser: "can",
-                  profilePic:
-                      "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
-                ),
-              );
+              return _MessageTile(messageData: userChats[index]);
             },
-            childCount: 1,
+            childCount: userChats.length,
           ),
         )
       ],
