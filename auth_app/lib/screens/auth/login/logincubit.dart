@@ -34,7 +34,8 @@ class LoginCubit extends Cubit<LoginState> {
       //await Future.delayed(const Duration(milliseconds: 500));
 
       Response response = await dio.post(
-          "http://10.80.1.165:8080/api/user/login",
+          //"http://10.80.1.165:8080/api/user/login",
+          "http://192.168.254.4:8080/api/user/login",
           data: {"username": email, "password": password});
 
       Token data = Token.fromJson(response.data);

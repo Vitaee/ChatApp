@@ -62,5 +62,7 @@ async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_u
 @router.get("/messages/{room_name}/")
 async def messages(db:AsyncIOMotorClient = Depends(get_database), room_name: str = ""):
     room_messages = await get_messages(db, room_name)
-
-    return JSONResponse(status_code=HTTP_200_OK, content=room_messages)
+    if room_messages:
+        return JSONResponse(status_code=HTTP_200_OK, content=room_messages)
+    else:
+        return JSONResponse(status_code=HTTP_200_OK, content=[{}])
