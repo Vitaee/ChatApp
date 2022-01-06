@@ -1,11 +1,13 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/models/private_messages.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
@@ -18,12 +20,28 @@ class ChatScreen extends StatelessWidget {
         ),
       );
 
-  const ChatScreen({
+  ChatScreen({
     Key? key,
     required this.messageData,
   }) : super(key: key);
 
   final MessageData messageData;
+
+  Future<DirectMessages?> getMessages(String roomName) async {
+    final Dio dio = Dio();
+
+    try {
+      Response res =
+          await dio.get("http://10.80.1.165:8080/api/messages/$roomName/");
+      DirectMessages data = DirectMessages.fromJson(res.data);
+      return data;
+    } on Exception catch (e) {
+      print(e); // we got NULL
+      return null;
+    }
+  }
+
+  late final Future<DirectMessages?> messages = getMessages("room1");
 
   @override
   Widget build(BuildContext context) {
@@ -71,11 +89,27 @@ class ChatScreen extends StatelessWidget {
             ),
           ],
         ),
-        body: MessageSendBar(
-            //roomName: "${messageData.recvUsername}-${messageData.currentUser}",
-            roomName: "room1",
-            sourceUser: messageData.currentUser!,
-            targetUser: messageData.recvUsername));
+        body: FutureBuilder(
+            future: messages,
+            builder: (context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.hasError) {
+                print(snapshot.data);
+                return Center(
+                  child: Text("denemee"),
+                );
+              } else if (snapshot.hasData) {
+                return MessageSendBar(
+                    roomName: "room1",
+                    sourceUser: messageData.currentUser!,
+                    targetUser: messageData.recvUsername,
+                    data: snapshot.data);
+              } else if (snapshot.connectionState == ConnectionState.waiting) {
+                print("burda kaldım..");
+                return Center(child: CircularProgressIndicator());
+              } else {
+                return CircularProgressIndicator();
+              }
+            }));
   }
 }
 
@@ -84,12 +118,14 @@ class MessageSendBar extends StatefulWidget {
       {Key? key,
       required this.roomName,
       required this.sourceUser,
-      required this.targetUser})
+      required this.targetUser,
+      required this.data})
       : super(key: key);
 
   String roomName;
   String sourceUser;
   String? targetUser;
+  dynamic data;
 
   late WebSocketChannel channel = IOWebSocketChannel.connect(
       "ws://10.80.1.165:8080/api/chat/$roomName/",
@@ -101,7 +137,7 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
-  List<dynamic> messages = [];
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -116,17 +152,21 @@ class _MessageSendBarState extends State<MessageSendBar> {
                 if (snapshot.connectionState != ConnectionState.waiting) {
                   return ListView.builder(
                     itemBuilder: (context, index) {
-                      if (messages[index].user == widget.sourceUser) {
+                      print("\n");
+                      print(snapshot.data);
+                      //print(messages[index].user);
+                      print("\n");
+                      if (widget.data[index].user == widget.sourceUser) {
                         return _MessageOwnTile(
-                            message: messages[index].data,
+                            message: widget.data[index].data,
                             messageDate: "21:05 PM");
                       } else {
                         return _MessageTile(
-                            message: messages[index].data,
+                            message: widget.data[index].data,
                             messageDate: "21:05 PM");
                       }
                     },
-                    itemCount: messages.length,
+                    itemCount: snapshot.data.length,
                   );
                 } else {
                   return Center(
@@ -196,14 +236,14 @@ class _MessageSendBarState extends State<MessageSendBar> {
       widget.channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}" }]');
 
-      DirectMessages message = DirectMessages(
+      /*DirectMessages message = DirectMessages(
           type: "entrance",
           data: text_controller.text,
           room_name: widget.roomName,
           user: widget.sourceUser,
           target_user: widget.targetUser,
-          time: DateTime.now().toString().substring(10, 16));
-      messages.add(message);
+          time: DateTime.now().toString().substring(10, 16));*/
+      //messages.add(message);
       text_controller.clear();
     }
   }

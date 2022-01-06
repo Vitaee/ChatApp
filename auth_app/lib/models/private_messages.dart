@@ -4,15 +4,14 @@ class DirectMessages {
   String? room_name;
   String? user;
   String? target_user;
-  String? time;
 
-  DirectMessages(
-      {this.type,
-      this.data,
-      this.room_name,
-      this.user,
-      this.target_user,
-      this.time});
+  DirectMessages({
+    this.type,
+    this.data,
+    this.room_name,
+    this.user,
+    this.target_user,
+  });
 
   DirectMessages.fromJson(Map<String, dynamic> json) {
     type = json["type"];
@@ -20,7 +19,6 @@ class DirectMessages {
     room_name = json["room_name"];
     user = json["user"];
     target_user = json["target_user"];
-    time = json["time"];
   }
 
   Map<String, dynamic> toJson() {
@@ -30,7 +28,6 @@ class DirectMessages {
     data['room_name'] = this.room_name;
     data['user'] = this.user;
     data['target_user'] = this.target_user;
-    data["time"] = this.time;
     return data;
   }
 }

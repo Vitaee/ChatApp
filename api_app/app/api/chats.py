@@ -18,6 +18,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
     current_username = current_user
     try:
         await manager.connect(websocket, room_name)
+       
         await insert_room(db, current_username, room_name)
         room = await get_room(db, room_name)
         data = {

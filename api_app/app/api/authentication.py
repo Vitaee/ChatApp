@@ -9,7 +9,7 @@ from fastapi.encoders import jsonable_encoder
 from core.auth_bearer import JwtBearer
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token, get_current_user_authorizer
-from crud.user import create_user, check_free_email, get_user
+from crud.user import create_user, check_free_email, get_messages, get_user
 from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse
 from models.token import TokenResponse
 
@@ -58,3 +58,9 @@ async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depend
 async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_username: User = Depends(JwtBearer())):
     current_user =  await get_user(db, field="username", value=current_username) 
     return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(current_user))
+
+@router.get("/messages/{room_name}/")
+async def messages(db:AsyncIOMotorClient = Depends(get_database), room_name: str = ""):
+    room_messages = await get_messages(db, room_name)
+
+    return JSONResponse(status_code=HTTP_200_OK, content=room_messages)

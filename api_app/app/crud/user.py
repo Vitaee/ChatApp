@@ -1,3 +1,4 @@
+from fastapi.encoders import jsonable_encoder
 from db.mongosdb import AsyncIOMotorClient
 from typing import Optional, Union
 from pydantic import EmailStr
@@ -36,3 +37,8 @@ async def create_user(conn: AsyncIOMotorClient, user: UserInCreate) -> UserInDB:
     row = await conn[database_name][user_collection_name].insert_one(db_user)
 
     return UserInDB(**user.dict())
+
+async def get_messages(conn: AsyncIOMotorClient, room_name:str):
+    row = await conn[database_name]["rooms"].find_one({"room_name":room_name})
+    
+    return jsonable_encoder(row["messages"])
