@@ -1,4 +1,6 @@
 // ignore_for_file: must_be_immutable
+import 'dart:convert';
+
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
 import 'package:auth_app/models/message_data.dart';
@@ -26,50 +28,54 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          iconTheme: Theme.of(context).iconTheme,
-          centerTitle: false,
-          backgroundColor: Color(0xff3a434d),
-          elevation: 0,
-          leadingWidth: 54,
-          leading: Align(
-            alignment: Alignment.centerRight,
-            child: InkWell(
-                child: Icon(
-                  CupertinoIcons.back,
-                  size: 28,
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                }),
-          ),
-          title: _AppBarTitle(
-            messageData: messageData,
-          ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Center(
-                child: Icon(
-                  CupertinoIcons.video_camera_solid,
-                  size: 26,
-                  //onTap: () {},
-                ),
+      appBar: AppBar(
+        iconTheme: Theme.of(context).iconTheme,
+        centerTitle: false,
+        backgroundColor: Color(0xff3a434d),
+        elevation: 0,
+        leadingWidth: 54,
+        leading: Align(
+          alignment: Alignment.centerRight,
+          child: InkWell(
+              child: Icon(
+                CupertinoIcons.back,
+                size: 28,
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: Center(
-                child: Icon(
-                  CupertinoIcons.phone_solid,
-                  size: 26,
-                  //onTap: () {},
-                ),
-              ),
-            ),
-          ],
+              onTap: () {
+                Navigator.of(context).pop();
+              }),
         ),
-        body: FutureBuilder(
+        title: _AppBarTitle(
+          messageData: messageData,
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Center(
+              child: Icon(
+                CupertinoIcons.video_camera_solid,
+                size: 26,
+                //onTap: () {},
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Center(
+              child: Icon(
+                CupertinoIcons.phone_solid,
+                size: 26,
+                //onTap: () {},
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: MessageSendBar(
+          roomName: "room1",
+          sourceUser: messageData.currentUser!,
+          targetUser: messageData.recvUsername),
+      /*body: FutureBuilder(
             future: getMessages("room1"),
             builder: (context, AsyncSnapshot<List<DirectMessages>?> snapshot) {
               if (snapshot.hasData) {
@@ -88,6 +94,8 @@ class ChatScreen extends StatelessWidget {
                     data: snapshot.data);
               } else if (snapshot.connectionState == ConnectionState.waiting) {
                 print("waitin for data");
+                print(snapshot.data);
+                print("^^^^^^^^^^^^^^^^^");
                 print(snapshot.error);
                 return Center(child: CircularProgressIndicator());
               } else {
@@ -99,28 +107,29 @@ class ChatScreen extends StatelessWidget {
                     targetUser: messageData.recvUsername,
                     data: snapshot.data);
               }
-            }));
+            })*/
+    );
   }
 }
 
 class MessageSendBar extends StatefulWidget {
-  MessageSendBar(
-      {Key? key,
-      required this.roomName,
-      required this.sourceUser,
-      required this.targetUser,
-      required this.data})
-      : super(key: key);
+  MessageSendBar({
+    Key? key,
+    required this.roomName,
+    required this.sourceUser,
+    required this.targetUser,
+    //required this.data})
+  }) : super(key: key);
 
   String roomName;
   String sourceUser;
   String? targetUser;
-  List<dynamic>? data;
+  //List<dynamic>? data;
 
-  late WebSocketChannel channel = IOWebSocketChannel.connect(
-      //"ws://10.80.1.165:8080/api/chat/$roomName/",
-      "ws://192.168.254.4:8080/api/chat/$roomName/",
-      headers: {"Current-User": sourceUser});
+  late WebSocketChannel channel =
+      IOWebSocketChannel.connect("ws://10.80.1.165:8080/api/chat/$roomName/",
+          //"ws://192.168.254.4:8080/api/chat/$roomName/",
+          headers: {"Current-User": sourceUser});
 
   @override
   _MessageSendBarState createState() => _MessageSendBarState();
@@ -128,7 +137,7 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
-  late List<dynamic>? all_messages = widget.data;
+  //late List<dynamic>? all_messages = widget.data;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -139,29 +148,32 @@ class _MessageSendBarState extends State<MessageSendBar> {
             // _DateLable(lable: "Yestarday"),
             child: StreamBuilder(
               stream: widget.channel.stream,
-              builder: (context, AsyncSnapshot<dynamic> snapshot) {
+              builder: (context, dynamic snapshot) {
                 if (snapshot.connectionState != ConnectionState.waiting) {
-                  print(snapshot.data);
+                  List parsed = json.decode(snapshot.data);
+
+                  List<DirectMessages> list =
+                      parsed.map((e) => DirectMessages.fromJson(e)).toList();
+
                   return ListView.builder(
                       itemBuilder: (context, index) {
-                        if (all_messages?[index].data != null) {
-                          if (all_messages?[index].user == widget.sourceUser) {
+                        if (list[index].data != null) {
+                          if (list[index].user == widget.sourceUser) {
                             return _MessageOwnTile(
-                                message: all_messages?[index].data,
+                                message: list[index].data.toString(),
                                 messageDate: "21:05 PM");
                           } else {
                             return _MessageTile(
-                                message: all_messages?[index].data,
+                                message: list[index].data.toString(),
                                 messageDate: "21:05 PM");
                           }
                         } else {
                           return Center(
-                            child: Text("Write your first message!"),
+                            child: CircularProgressIndicator(),
                           );
                         }
                       },
-                      itemCount:
-                          widget.data?[0] != null ? all_messages?.length : 0);
+                      itemCount: snapshot.data != null ? list.length : 0);
                 } else {
                   return Center(
                     child: CircularProgressIndicator(),
@@ -227,17 +239,19 @@ class _MessageSendBarState extends State<MessageSendBar> {
 
   void sendData() {
     if (text_controller.text.isNotEmpty) {
-      widget.channel.sink.add(
-          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}" }]');
-
-      DirectMessages message = DirectMessages(
+      /*DirectMessages message = DirectMessages(
         type: "entrance",
         data: text_controller.text,
         room_name: widget.roomName,
         user: widget.sourceUser,
         target_user: widget.targetUser,
-      );
-      all_messages?.add(message);
+      );*/
+
+      //all_messages!.add(message);
+
+      widget.channel.sink.add(
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}" }]');
+
       text_controller.clear();
     }
   }

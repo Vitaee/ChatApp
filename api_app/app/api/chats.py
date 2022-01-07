@@ -4,6 +4,7 @@ from fastapi.param_functions import Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from starlette.requests import Request
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
+from crud.user import get_messages
 from db.mongosdb import get_database
 from crud.chat import get_room, insert_room, manager, upload_message_to_room
 import json
@@ -21,16 +22,17 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
        
         await insert_room(db, current_username, room_name)
         room = await get_room(db, room_name)
-        data = {
-            "content": f"{current_username} has joined the chat.",
-            "user": current_username,
-            "room_name": room_name,
-            "type":"entrance",
-            "data":"",
-            "room_object": str(room['_id'])
-        }
+        all_messages = await get_messages(db, room_name)
+        #data = {
+        #    "content": f"{current_username} has joined the chat.",
+        #    "user": current_username,
+        #    "room_name": room_name,
+        #    "type":"entrance",
+        #    "data":"",
+        #    "room_object": str(room['_id'])
+        #}
 
-        await manager.broadcast(data)
+        await manager.broadcast(all_messages)
 
         # wait for messages
 
@@ -38,12 +40,17 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
             if websocket.application_state == WebSocketState.CONNECTED:
                 data = await websocket.receive_text()
                 message_data = json.loads(data)
+                
+               
                 if "type" in message_data and message_data["type"] == "dismissal":
                     await manager.disconnect(websocket, room_name)
                     break
                 else:
                     await upload_message_to_room(db,message_data)
-                    await manager.broadcast(message_data)
+                    #all_messages = await get_messages(db, room_name)
+                    all_messages.append(message_data[0])
+                    #await manager.broadcast(message_data)
+                    await manager.broadcast(all_messages)
             else:
                 await manager.connect(websocket, room_name)
 
