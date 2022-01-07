@@ -9,7 +9,7 @@ class Room(BaseModel):
     messages: Optional[List] = []
     last_pinged: datetime = Field(default_factory=datetime.utcnow)
     active: bool = False
-
+    created_by: str
 
 class RoomInDB(Room):
     id : PyObjectId = Field(default_factory=PyObjectId, alias="_id")

@@ -49,7 +49,9 @@ async def insert_room(db: AsyncIOMotorClient, username, room_name):
         return ""
     else: 
         room["members"] = [  user.username ] if user is not None else ""
+        room["created_by"] = user.username
         dbroom = RoomInDB(**room)
+        dbroom.dict().pop(f"{id}", None)
         response = await db["chat-app"]["rooms"].insert_one(dbroom.dict())
         return response.inserted_id
     

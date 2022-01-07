@@ -13,7 +13,7 @@ router = APIRouter()
 @router.websocket("/chat/{room_name}/")
 async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, room_name: str = None, current_user: str = Header(None)):
     print()
-    print("\t", current_user ,"\n")
+    print("\t", current_user , " <-- connected.")
     print()
 
     current_username = current_user
@@ -21,16 +21,8 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         await manager.connect(websocket, room_name)
        
         await insert_room(db, current_username, room_name)
-        room = await get_room(db, room_name)
+        #room = await get_room(db, room_name)
         all_messages = await get_messages(db, room_name)
-        #data = {
-        #    "content": f"{current_username} has joined the chat.",
-        #    "user": current_username,
-        #    "room_name": room_name,
-        #    "type":"entrance",
-        #    "data":"",
-        #    "room_object": str(room['_id'])
-        #}
 
         await manager.broadcast(all_messages)
 
@@ -60,3 +52,16 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         print(type(e).__name__, e.args, e.__repr__)
         print()
         manager.disconnect(websocket, room_name)
+
+@router.websocket("/chats")
+async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, current_user: str = Header(None)):
+    print()
+    print("\t", current_user, " <-- connected")
+    print()
+    # check if message sended to this user.
+
+    # message count: int = 0 
+    # target user: str = "Can"
+
+
+
