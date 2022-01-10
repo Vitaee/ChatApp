@@ -10,14 +10,12 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  //late final Future<String?> myFuture = checkPrefs();
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<String?>(
       future: checkPrefs(),
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
-        if (snapshot.hasData && snapshot.data.toString() != "no data") {
+        if (snapshot.hasData) {
           return MaterialApp(
             title: "Chat App",
             debugShowCheckedModeBanner: false,
@@ -33,7 +31,9 @@ class MyApp extends StatelessWidget {
             },
             initialRoute: '/home',
           );
-        } else if (snapshot.hasError) {
+        } else if (snapshot.hasError ||
+            snapshot.data == null &&
+                snapshot.connectionState != ConnectionState.waiting) {
           return MaterialApp(
             title: "Chat App",
             debugShowCheckedModeBanner: false,

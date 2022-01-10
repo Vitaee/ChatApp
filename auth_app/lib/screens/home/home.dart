@@ -7,19 +7,18 @@ import 'package:auth_app/services/currentuser.dart';
 import 'package:flutter/material.dart';
 
 class HomeScaffold extends StatelessWidget {
-  late final Future<User?> myFuture = currentUser();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<User?>(
-        future: myFuture,
+        future: currentUser(),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasError) {
+          if (snapshot.hasError ||
+              snapshot.data == null &&
+                  snapshot.connectionState != ConnectionState.waiting) {
             return LoginScaffold();
           } else if (snapshot.hasData) {
             return ChatScreen();
-          } else if (snapshot.data == null) {
-            return LoginScaffold();
           } else {
             return Center(child: CircularProgressIndicator());
           }

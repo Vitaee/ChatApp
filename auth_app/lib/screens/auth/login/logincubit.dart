@@ -1,9 +1,9 @@
 import 'package:auth_app/models/token.dart';
+import 'package:auth_app/screens/auth/register/models/email.dart';
+import 'package:auth_app/screens/auth/register/models/password.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:auth_app/screens/auth/models/email.dart';
-import 'package:auth_app/screens/auth/models/password.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'loginstate.dart';
 

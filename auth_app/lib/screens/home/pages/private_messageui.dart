@@ -5,7 +5,6 @@ import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/models/private_messages.dart';
-import 'package:auth_app/services/scrapmessages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
@@ -75,39 +74,6 @@ class ChatScreen extends StatelessWidget {
           roomName: "room1",
           sourceUser: messageData.currentUser!,
           targetUser: messageData.recvUsername),
-      /*body: FutureBuilder(
-            future: getMessages("room1"),
-            builder: (context, AsyncSnapshot<List<DirectMessages>?> snapshot) {
-              if (snapshot.hasData) {
-                return MessageSendBar(
-                    roomName: "room1",
-                    sourceUser: messageData.currentUser!,
-                    targetUser: messageData.recvUsername,
-                    data: snapshot.data);
-              } else if (snapshot.hasError) {
-                print("has error");
-                print(snapshot.error);
-                return MessageSendBar(
-                    roomName: "room1",
-                    sourceUser: messageData.currentUser!,
-                    targetUser: messageData.recvUsername,
-                    data: snapshot.data);
-              } else if (snapshot.connectionState == ConnectionState.waiting) {
-                print("waitin for data");
-                print(snapshot.data);
-                print("^^^^^^^^^^^^^^^^^");
-                print(snapshot.error);
-                return Center(child: CircularProgressIndicator());
-              } else {
-                print("else worked");
-                print(snapshot.error);
-                return MessageSendBar(
-                    roomName: "room1",
-                    sourceUser: messageData.currentUser!,
-                    targetUser: messageData.recvUsername,
-                    data: snapshot.data);
-              }
-            })*/
     );
   }
 }
@@ -137,7 +103,6 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
-  //late List<dynamic>? all_messages = widget.data;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -239,16 +204,6 @@ class _MessageSendBarState extends State<MessageSendBar> {
 
   void sendData() {
     if (text_controller.text.isNotEmpty) {
-      /*DirectMessages message = DirectMessages(
-        type: "entrance",
-        data: text_controller.text,
-        room_name: widget.roomName,
-        user: widget.sourceUser,
-        target_user: widget.targetUser,
-      );*/
-
-      //all_messages!.add(message);
-
       widget.channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}" }]');
 
@@ -260,24 +215,6 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void dispose() {
     widget.channel.sink.close();
     super.dispose();
-  }
-}
-
-class _DemoMessageList extends StatelessWidget {
-  const _DemoMessageList({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ListView(
-        children: const [
-          _DateLable(lable: 'Yesterday'),
-          _MessageOwnTile(message: "message", messageDate: "21:05 PM"),
-          _MessageTile(message: "message2", messageDate: "21:06 PM")
-        ],
-      ),
-    );
   }
 }
 
@@ -473,65 +410,6 @@ class _AppBarTitle extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-}
-
-class _ActionBottomBar extends StatelessWidget {
-  const _ActionBottomBar({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: true,
-      top: false,
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              border: Border(
-                right: BorderSide(
-                  width: 2,
-                  color: Theme.of(context).dividerColor,
-                ),
-              ),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 14.0),
-              child: Icon(
-                CupertinoIcons.camera_fill,
-                size: 28,
-              ),
-            ),
-          ),
-          const Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: 16.0),
-              child: TextField(
-                style: TextStyle(fontSize: 16),
-                decoration: InputDecoration(
-                  hintText: 'Type something...',
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 12,
-              right: 10.0,
-              bottom: 5,
-            ),
-            child: GlowingActionButton(
-              color: Color(0xfff4ac47), //Colors.accent,
-              icon: Icons.send_sharp,
-              onPressed: () {
-                print('TODO: send a message');
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

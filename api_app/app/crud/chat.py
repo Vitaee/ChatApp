@@ -55,8 +55,6 @@ async def insert_room(db: AsyncIOMotorClient, username, room_name):
         response = await db["chat-app"]["rooms"].insert_one(dbroom.dict())
         return response.inserted_id
     
-    
-
 async def get_rooms(db: AsyncIOMotorClient, username: str = None):
     "get rooms of user has"
     collection = await db["chat-app"]["rooms"]

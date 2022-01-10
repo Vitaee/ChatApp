@@ -1,7 +1,7 @@
 from datetime import datetime
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from .jwt import ALGORITHM, auth_token
+from .jwt import ALGORITHM
 import jwt
 from core.config import JWT_TOKEN_PREFIX, SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
 

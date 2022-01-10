@@ -1,7 +1,7 @@
+import 'package:auth_app/screens/auth/register/models/email.dart';
+import 'package:auth_app/screens/auth/register/models/password.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
-import 'package:auth_app/screens/auth/models/email.dart';
-import 'package:auth_app/screens/auth/models/password.dart';
 
 class LoginState extends Equatable {
   const LoginState({

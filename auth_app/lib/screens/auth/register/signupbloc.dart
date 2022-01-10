@@ -2,12 +2,12 @@
 import 'dart:io';
 
 import 'package:auth_app/models/token.dart';
+import 'package:auth_app/screens/auth/register/models/confirm_password.dart';
+import 'package:auth_app/screens/auth/register/models/email.dart';
+import 'package:auth_app/screens/auth/register/models/name.dart';
+import 'package:auth_app/screens/auth/register/models/password.dart';
 import 'package:auth_app/screens/auth/register/signupevent.dart';
 import 'package:bloc/bloc.dart';
-import 'package:auth_app/screens/auth/models/email.dart';
-import 'package:auth_app/screens/auth/models/name.dart';
-import 'package:auth_app/screens/auth/models/password.dart';
-import 'package:auth_app/screens/auth/models/confirm_password.dart';
 import 'package:dio/dio.dart';
 import 'package:formz/formz.dart';
 import 'package:shared_preferences/shared_preferences.dart';

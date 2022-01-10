@@ -1,14 +1,13 @@
 import shutil, os 
 from fastapi import APIRouter, Body, Depends, UploadFile, File
 from starlette.exceptions import HTTPException
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse
 from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from pydantic import EmailStr
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.encoders import jsonable_encoder
 from core.auth_bearer import JwtBearer
 from db.mongosdb import AsyncIOMotorClient, get_database
-from core.jwt import create_access_token, get_current_user_authorizer
+from core.jwt import create_access_token
 from crud.user import create_user, check_free_email, get_messages, get_user
 from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse
 from models.token import TokenResponse
@@ -43,9 +42,9 @@ async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depend
     print(data)
     if '@' in data.username:
         field = "email"
+    
     else: 
         field = "username"
-
     
     dbuser = await get_user(db, field = field, value = data.username )
     if not dbuser or not dbuser.check_password(data.password):
@@ -64,5 +63,5 @@ async def messages(db:AsyncIOMotorClient = Depends(get_database), room_name: str
     room_messages = await get_messages(db, room_name)
     if room_messages:
         return JSONResponse(status_code=HTTP_200_OK, content=room_messages)
-    else:
-        return JSONResponse(status_code=HTTP_200_OK, content=[{}])
+
+    return JSONResponse(status_code=HTTP_200_OK, content=[{}])
