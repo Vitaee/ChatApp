@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Header
 from fastapi.param_functions import Depends
 from motor.motor_asyncio import AsyncIOMotorClient
+from starlette.responses import JSONResponse
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
+from core.auth_bearer import JwtBearer
 from crud.user import get_messages
 from db.mongosdb import get_database
 from crud.chat import insert_room, manager, upload_message_to_room
+from models.user import User
 import json
+from starlette.status import HTTP_200_OK
 router = APIRouter()
 
 @router.websocket("/chat/{room_name}/")
@@ -55,5 +59,29 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
     # message count: int = 0 
     # target user: str = "Can"
 
+@router.get("/user/chats")
+async def get_messages_of_user(db: AsyncIOMotorClient, current_user: User = Depends(JwtBearer())):
+    """This function will return current user chats with other ones."""
+    chat_response = { "chats": [] }
+    to_target_username = await db["chat-app"]["rooms"].find_one( { 'created_by' : current_user  } )
+    target_user = to_target_username["target_user"]
 
+    get_target_user = await db["chat-app"]["users"].find_one( {'username':target_user} )
 
+    to_response = {}
+
+    to_response["recvUsername"] = target_user
+    if to_target_username["messages"][-1]["user"] == target_user:
+        # target user's last message
+        to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
+    else:
+        # your last message
+        to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
+
+    to_response["lastMessageDate"] = "17/2/2021"
+    to_response["currentUser"] = current_user
+    to_response["profilePic"] = get_target_user["image"]
+
+    chat_response["chats"].append(to_response)
+
+    return JSONResponse(status_code=HTTP_200_OK, content = chat_response)

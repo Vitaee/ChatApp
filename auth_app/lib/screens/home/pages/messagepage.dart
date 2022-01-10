@@ -11,6 +11,11 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
+  Future<List<MessageData>?> getChats() async {
+    //This future will get current user's chats with others."
+    print("object");
+  }
+
   List<dynamic> userChats = [
     MessageData(
       recvUsername: "sloon",
