@@ -78,7 +78,8 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: User = Depe
         # your last message
         to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
 
-    to_response["lastMessageDate"] = "17/2/2021"
+    to_response["lastMessageDate"] = to_target_username["messages"][-1]["date_sended"]
+    to_response["message_seen_by_tuser"] = to_target_username["messages"][-1]["message_seen_by_tuser"]
     to_response["currentUser"] = current_user
     to_response["profilePic"] = get_target_user["image"]
 

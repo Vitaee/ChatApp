@@ -205,7 +205,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void sendData() {
     if (text_controller.text.isNotEmpty) {
       widget.channel.sink.add(
-          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}" }]');
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "message_seen_by_tuser":"${false}", "date_sended":"${DateTime.now()}", }]');
 
       text_controller.clear();
     }
