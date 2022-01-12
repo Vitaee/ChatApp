@@ -95,7 +95,7 @@ class MessageSendBar extends StatefulWidget {
   late WebSocketChannel channel =
       IOWebSocketChannel.connect("ws://10.80.1.165:8080/api/chat/$roomName/",
           //"ws://192.168.254.4:8080/api/chat/$roomName/",
-          headers: {"Current-User": sourceUser});
+          headers: {"Current-User": sourceUser, "Target-User": targetUser});
 
   @override
   _MessageSendBarState createState() => _MessageSendBarState();
@@ -205,7 +205,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void sendData() {
     if (text_controller.text.isNotEmpty) {
       widget.channel.sink.add(
-          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "message_seen_by_tuser":"${false}", "date_sended":"${DateTime.now()}", }]');
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "message_seen_by_tuser":"false", "date_sended":"${DateTime.now()}" }]');
 
       text_controller.clear();
     }

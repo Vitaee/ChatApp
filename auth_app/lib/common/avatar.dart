@@ -46,7 +46,8 @@ class Avatar extends StatelessWidget {
     if (url != null) {
       return CircleAvatar(
         radius: radius,
-        backgroundImage: CachedNetworkImageProvider(url!),
+        backgroundImage: CachedNetworkImageProvider(
+            url.toString().replaceFirst("localhost", "http://10.80.1.165")),
         backgroundColor: Theme.of(context).cardColor,
       );
     } else {

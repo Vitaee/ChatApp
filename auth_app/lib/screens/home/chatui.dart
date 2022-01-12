@@ -1,5 +1,6 @@
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/screens/home/pages/messagepage.dart';
+import 'package:auth_app/screens/search/searchui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,16 +45,11 @@ class ChatScreen extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 18.0),
-            child: Hero(
-              tag:
-                  "https://t4.ftcdn.net/jpg/00/84/67/19/360_F_84671939_jxymoYZO8Oeacc3JRBDE8bSXBWj0ZfA9.jpg",
-              child: Avatar.small(
-                url:
-                    "https://t4.ftcdn.net/jpg/00/84/67/19/360_F_84671939_jxymoYZO8Oeacc3JRBDE8bSXBWj0ZfA9.jpg",
-                onTap: () {
-                  Navigator.pushNamed(context, '/home');
-                },
-              ),
+            child: InkWell(
+              child: Icon(Icons.search, color: Colors.white),
+              onTap: () {
+                showSearch(context: context, delegate: SearchUser());
+              },
             ),
           ),
         ],

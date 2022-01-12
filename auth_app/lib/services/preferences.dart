@@ -5,7 +5,7 @@ Future<String?> checkPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? jwt = await prefs.getString("jwt");
 
-    print(jwt);
+    //print(jwt);
 
     if (jwt == null) {
       return null;

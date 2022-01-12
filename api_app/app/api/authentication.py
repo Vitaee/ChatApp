@@ -2,13 +2,13 @@ import shutil, os
 from fastapi import APIRouter, Body, Depends, UploadFile, File
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
-from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from pydantic import EmailStr
 from fastapi.encoders import jsonable_encoder
 from core.auth_bearer import JwtBearer
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token
-from crud.user import create_user, check_free_email, get_messages, get_user
+from crud.user import create_user, check_free_email, get_filtered_users, get_messages, get_user
 from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse
 from models.token import TokenResponse
 
@@ -57,6 +57,19 @@ async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depend
 async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_username: User = Depends(JwtBearer())):
     current_user =  await get_user(db, field="username", value=current_username) 
     return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(current_user))
+
+@router.post("/user/filter/{query}", response_model=UserBase, name="Get all users")
+async def filter_users(query: str, db:AsyncIOMotorClient=Depends(get_database), current_user: User = Depends(JwtBearer())  ):
+    finded_users = await get_filtered_users(db, query )
+    
+    #finded_users =   await db["chat-app"]["users"].aggregate( [{'$match':{'username':{ "$regex":f'{query}'}}}] )
+
+    #finded_users["result"][0])
+
+    if finded_users:
+        return JSONResponse(status_code=HTTP_200_OK, content= UserBase(**finded_users["result"][0]).dict())
+    else:
+        return JSONResponse(status_code=HTTP_404_NOT_FOUND, content={"error":"User not found!"})
 
 @router.get("/messages/{room_name}/")
 async def messages(db:AsyncIOMotorClient = Depends(get_database), room_name: str = ""):

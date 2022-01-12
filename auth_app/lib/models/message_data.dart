@@ -3,8 +3,8 @@ class MessageData {
   String? lastMessage;
   String? lastMessageDate;
   String? profilePic;
-  bool? isOnline;
-  bool? sawbyUser;
+  //bool? isOnline;
+  String? sawbyUser;
   String? currentUser;
 
   MessageData(
@@ -12,29 +12,29 @@ class MessageData {
       this.lastMessage,
       this.lastMessageDate,
       this.profilePic,
-      this.isOnline,
+      //this.isOnline,
       this.sawbyUser,
       this.currentUser});
 
   MessageData.fromJson(Map<String, dynamic> json) {
-    recvUsername = json['recv_username'];
-    lastMessage = json['last_message'];
-    lastMessageDate = json['last_message_date'];
-    profilePic = json['profile_pic'];
-    isOnline = json['is_online'];
-    sawbyUser = json['sawby_user'];
-    currentUser = json['current_user'];
+    recvUsername = json['recvUsername'];
+    lastMessage = json['lastMessage'];
+    lastMessageDate = json['lastMessageDate'];
+    profilePic = json['profilePic'];
+    //isOnline = json['is_online'];
+    sawbyUser = json['message_seen_by_tuser'];
+    currentUser = json['currentUser'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['recv_username'] = this.recvUsername;
-    data['last_message'] = this.lastMessage;
-    data['last_message_date'] = this.lastMessageDate;
-    data['profile_pic'] = this.profilePic;
-    data['is_online'] = this.isOnline;
-    data['sawby_user'] = this.sawbyUser;
-    data['current_user'] = this.currentUser;
+    data['recvUsername'] = this.recvUsername;
+    data['lastMessage'] = this.lastMessage;
+    data['lastMessageDate'] = this.lastMessageDate;
+    data['profilePic'] = this.profilePic;
+    //data['is_online'] = this.isOnline;
+    data['message_seen_by_tuser'] = this.sawbyUser;
+    data['currentUser'] = this.currentUser;
     return data;
   }
 }

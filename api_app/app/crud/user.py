@@ -17,6 +17,13 @@ async def get_user( conn: AsyncIOMotorClient, field: str, value: str) -> Union[U
 
     return False
 
+async def get_filtered_users(conn: AsyncIOMotorClient, query: str):
+    users =  await conn[database_name][user_collection_name].aggregate( [{'$match':{'username':{ "$regex":f'{query}'}}}] ).to_list(length=50)
+    if users:
+        return { "result": users }
+    else:
+        return False
+
 async def check_free_email(conn:AsyncIOMotorClient, email: str = None):
 
     user_by_email = await get_user(conn, field= "email" , value = email)

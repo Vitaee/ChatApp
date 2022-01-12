@@ -2,6 +2,7 @@
 import 'package:auth_app/screens/auth/login/signin.dart';
 import 'package:auth_app/screens/auth/register/signup.dart';
 import 'package:auth_app/screens/home/home.dart';
+import 'package:auth_app/screens/search/searchui.dart';
 import 'package:auth_app/services/preferences.dart';
 import 'package:flutter/material.dart';
 

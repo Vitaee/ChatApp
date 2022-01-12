@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/models/message_data.dart';
+import 'package:auth_app/models/private_messages.dart';
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({Key? key}) : super(key: key);
@@ -11,45 +16,79 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
-  Future<List<MessageData>?> getChats() async {
+  Future<List<MessageData>> getChats() async {
     //This future will get current user's chats with others."
-    print("object");
+    final Dio dio = Dio();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? jwt = prefs.getString("jwt");
+    BaseOptions options = BaseOptions(
+        responseType: ResponseType.plain,
+        headers: {"Authorization": "Bearer ${jwt}"});
+    dio.options = options;
+
+    try {
+      final res = await dio.get("http://10.80.1.165:8080/api/user/chats/");
+      if (res.statusCode == 404) {
+        return [];
+      }
+
+      final List parsed = json.decode(res.data)["chats"];
+
+      List<MessageData> list =
+          parsed.map((e) => MessageData.fromJson(e)).toList();
+
+      return list;
+    } on Exception catch (e) {
+      //print(e);
+      return [];
+    }
   }
 
-  List<dynamic> userChats = [
-    MessageData(
-      recvUsername: "sloon",
-      lastMessage: "hello! how are you?",
-      lastMessageDate: "17/2/2021",
-      currentUser: "can",
-      profilePic:
-          "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
-    ),
-    MessageData(
-      recvUsername: "can",
-      lastMessage: "hello!",
-      lastMessageDate: "17/2/2021",
-      currentUser: "sloon",
-      profilePic:
-          "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
-    ),
-  ];
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: _Stories(),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return _MessageTile(messageData: userChats[index]);
-            },
-            childCount: userChats.length,
-          ),
-        )
-      ],
+    return FutureBuilder(
+      future: getChats(),
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState != ConnectionState.waiting) {
+          if (snapshot.data.length >= 1) {
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _Stories(),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return _MessageTile(messageData: snapshot.data[index]);
+                    },
+                    childCount: snapshot.data.length,
+                  ),
+                )
+              ],
+            );
+          } else {
+            return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _Stories(),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return Center(
+                      child: Text("Text with someone!"),
+                    );
+                  }, childCount: 1),
+                ),
+              ],
+            );
+          }
+        } else {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 }
@@ -95,7 +134,7 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        messageData.recvUsername!,
+                        messageData.recvUsername.toString(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,
@@ -140,7 +179,7 @@ class _MessageTile extends StatelessWidget {
   }
 
   Widget _buildLastMessage() {
-    return Text(messageData.lastMessage!,
+    return Text("You: " + messageData.lastMessage.toString(),
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 12,
@@ -150,7 +189,7 @@ class _MessageTile extends StatelessWidget {
 
   Widget _buildLastMessageAt() {
     return Text(
-      messageData.lastMessageDate!,
+      messageData.lastMessageDate.toString().split(" ")[0],
       style: const TextStyle(
         fontSize: 11,
         letterSpacing: -0.2,

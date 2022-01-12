@@ -4,7 +4,7 @@ class DirectMessages {
   String? room_name;
   String? user;
   String? target_user;
-  bool? message_seen_by_tuser;
+  String? message_seen_by_tuser;
   DateTime? date_sended;
 
   DirectMessages(

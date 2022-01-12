@@ -29,7 +29,7 @@ class SocketManager:
 
 manager = SocketManager()
 
-async def insert_room(db: AsyncIOMotorClient, username, room_name):
+async def insert_room(db: AsyncIOMotorClient, username, target_user, room_name):
     "insert room for both users."
     room = {}
     room["room_name"] = room_name
@@ -50,6 +50,7 @@ async def insert_room(db: AsyncIOMotorClient, username, room_name):
     else: 
         room["members"] = [  user.username ] if user is not None else ""
         room["created_by"] = user.username
+        room["target_user"] = target_user
         dbroom = RoomInDB(**room)
         dbroom.dict().pop(f"{id}", None)
         response = await db["chat-app"]["rooms"].insert_one(dbroom.dict())
@@ -74,14 +75,13 @@ async def get_room(db: AsyncIOMotorClient, room_name : str = None):
 
 async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
     message_data = data[0]
-    message_data.pop("time",None)
     try:
         room = await get_room(db, message_data['room_name'])
         user = await get_user(db, field="username", value = message_data['user'])
 
         
         message_data['user'] = jsonable_encoder(user.username)
-        message_data.pop("room_name", None)
+        message_data.pop('room_name', None)
         await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"messages":message_data}} )
         return True
 
