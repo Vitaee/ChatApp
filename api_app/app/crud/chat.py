@@ -29,20 +29,20 @@ class SocketManager:
 
 manager = SocketManager()
 
-async def insert_room(db: AsyncIOMotorClient, username, target_user, room_name):
+async def insert_room(db: AsyncIOMotorClient, username, room_name):
     "insert room for both users."
     room = {}
     room["room_name"] = room_name
-    user = await get_user(db, field="username", value=username) 
+   
    
     
     
+    user = await get_user(db, field="username", value=username) 
     check_room = await db["chat-app"]["rooms"].count_documents(  {"room_name": room_name}  )
-
     if ( check_room > 0 ):
         user_to_room = await get_room(db, room_name)
         username_list = [m for m in user_to_room["members"]]
-      
+        
         if user.username not in username_list:
 
             await db["chat-app"]["rooms"].update_one({"room_name":room["room_name"]}, { "$push": {"members": user.username } })
@@ -50,7 +50,7 @@ async def insert_room(db: AsyncIOMotorClient, username, target_user, room_name):
     else: 
         room["members"] = [  user.username ] if user is not None else ""
         room["created_by"] = user.username
-        room["target_user"] = target_user
+        room["target_user"] = ""
         dbroom = RoomInDB(**room)
         dbroom.dict().pop(f"{id}", None)
         response = await db["chat-app"]["rooms"].insert_one(dbroom.dict())
@@ -83,6 +83,8 @@ async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
         message_data['user'] = jsonable_encoder(user.username)
         message_data.pop('room_name', None)
         await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"messages":message_data}} )
+        if not room["target_user"]:
+            await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"target_user":message_data["target_user"]}} )
         return True
 
     except Exception as e:

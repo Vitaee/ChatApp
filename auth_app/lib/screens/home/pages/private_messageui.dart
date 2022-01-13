@@ -95,7 +95,7 @@ class MessageSendBar extends StatefulWidget {
   late WebSocketChannel channel =
       IOWebSocketChannel.connect("ws://10.80.1.165:8080/api/chat/$roomName/",
           //"ws://192.168.254.4:8080/api/chat/$roomName/",
-          headers: {"Current-User": sourceUser + "," + targetUser.toString()});
+          headers: {"Current-User": sourceUser});
 
   @override
   _MessageSendBarState createState() => _MessageSendBarState();

@@ -15,11 +15,13 @@ router = APIRouter()
 @router.websocket("/chat/{room_name}/")
 async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, room_name: str = None, current_user: str = Header(None)):
     print("\n\t", current_user , " <-- connected.\n")
-    current_username = current_user.split(",")[0]
+    current_username = current_user
     try:
         await manager.connect(websocket, room_name)
-        await insert_room(db, current_username, current_user.split(",")[1],room_name)
+        await insert_room(db, current_username, room_name)
+        #print("\n\t", "print all messages", "\n\t")
         all_messages = await get_messages(db, room_name)
+        #print("\n\t", all_messages, "\n\n")
         await manager.broadcast(all_messages)
 
         # wait for messages
@@ -33,7 +35,11 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     break
                 else:
                     await upload_message_to_room(db,message_data)
+                    #print("\n\t", message_data[0], "\n\t")
+                    #print("\n\t", message_data,  "\n")
+                    
                     all_messages.append(message_data[0])
+                    #print("\n\t", all_messages, "\n\t")
                     await manager.broadcast(all_messages)
             else:
                 await manager.connect(websocket, room_name)
@@ -42,7 +48,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         print("\n")
         print("\tcould not connect --> ", e)
         print(type(e).__name__, e.args, e.__repr__)
-        print()
+        print("\n")
         manager.disconnect(websocket, room_name)
 
 @router.websocket("/chats")
@@ -86,7 +92,8 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
             to_response["message_seen_by_tuser"] = to_other_username["messages"][-1]["message_seen_by_tuser"]
             to_response["currentUser"] = current_user
             to_response["profilePic"] = get_target_user["image"]
-
+            
+            print("\n", to_response, "\n")
             chat_response["chats"].append(to_response)
 
             return JSONResponse(status_code=HTTP_200_OK, content = chat_response)
@@ -101,13 +108,16 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
 
             to_response = {}
 
-            to_response["recvUsername"] = target_user
+            to_response["recvUsername"] =  to_target_username["target_user"]
             if to_target_username["messages"][-1]["user"] == target_user:
                 # target user's last message
                 to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
+              
             else:
                 # your last message
                 to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
+                #to_response["recvUsername"] =  to_target_username["messages"][-1]["target_user"]
+
 
             to_response["lastMessageDate"] = to_target_username["messages"][-1]["date_sended"]
             to_response["message_seen_by_tuser"] = to_target_username["messages"][-1]["message_seen_by_tuser"]
