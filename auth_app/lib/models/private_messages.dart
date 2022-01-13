@@ -5,7 +5,7 @@ class DirectMessages {
   String? user;
   String? target_user;
   String? message_seen_by_tuser;
-  DateTime? date_sended;
+  String date_sended;
 
   DirectMessages(
       {this.type,
@@ -14,7 +14,7 @@ class DirectMessages {
       this.user,
       this.target_user,
       this.message_seen_by_tuser,
-      this.date_sended});
+      required this.date_sended});
 
   factory DirectMessages.fromJson(Map<String, dynamic> json) => DirectMessages(
       type: json["type"],

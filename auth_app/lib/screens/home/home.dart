@@ -5,6 +5,7 @@ import 'package:auth_app/screens/auth/login/signin.dart';
 import 'package:auth_app/screens/home/chatui.dart';
 import 'package:auth_app/services/currentuser.dart';
 import 'package:flutter/material.dart';
+import 'package:auth_app/common/myglobals.dart' as globals;
 
 class HomeScaffold extends StatelessWidget {
   @override
@@ -18,6 +19,7 @@ class HomeScaffold extends StatelessWidget {
                   snapshot.connectionState != ConnectionState.waiting) {
             return LoginScaffold();
           } else if (snapshot.hasData) {
+            globals.currentUsername = snapshot.data.username;
             return ChatScreen();
           } else {
             return Center(child: CircularProgressIndicator());

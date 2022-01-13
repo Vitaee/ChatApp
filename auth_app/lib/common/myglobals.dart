@@ -1,0 +1,3 @@
+library globals;
+
+String currentUsername = "";

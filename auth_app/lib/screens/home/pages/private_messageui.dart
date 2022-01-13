@@ -95,7 +95,7 @@ class MessageSendBar extends StatefulWidget {
   late WebSocketChannel channel =
       IOWebSocketChannel.connect("ws://10.80.1.165:8080/api/chat/$roomName/",
           //"ws://192.168.254.4:8080/api/chat/$roomName/",
-          headers: {"Current-User": sourceUser, "Target-User": targetUser});
+          headers: {"Current-User": sourceUser + "," + targetUser.toString()});
 
   @override
   _MessageSendBarState createState() => _MessageSendBarState();
@@ -126,11 +126,13 @@ class _MessageSendBarState extends State<MessageSendBar> {
                           if (list[index].user == widget.sourceUser) {
                             return _MessageOwnTile(
                                 message: list[index].data.toString(),
-                                messageDate: "21:05 PM");
+                                messageDate:
+                                    list[index].date_sended.split(" ")[1]);
                           } else {
                             return _MessageTile(
                                 message: list[index].data.toString(),
-                                messageDate: "21:05 PM");
+                                messageDate:
+                                    list[index].date_sended.split(" ")[1]);
                           }
                         } else {
                           return Center(
@@ -261,7 +263,7 @@ class _MessageTile extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
-                messageDate,
+                messageDate.split(".")[0],
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,
@@ -319,7 +321,7 @@ class _MessageOwnTile extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Text(
-                messageDate,
+                messageDate.split(".")[0],
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 10,

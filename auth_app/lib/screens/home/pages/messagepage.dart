@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/models/private_messages.dart';
+
+import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,7 @@ class _MessagesPageState extends State<MessagesPage> {
     String? jwt = prefs.getString("jwt");
     BaseOptions options = BaseOptions(
         responseType: ResponseType.plain,
-        headers: {"Authorization": "Bearer ${jwt}"});
+        headers: {"Current-User": globals.currentUsername});
     dio.options = options;
 
     try {
@@ -179,7 +181,8 @@ class _MessageTile extends StatelessWidget {
   }
 
   Widget _buildLastMessage() {
-    return Text("You: " + messageData.lastMessage.toString(),
+    // check if message sender == current user.
+    return Text(messageData.lastMessage.toString(),
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 12,
