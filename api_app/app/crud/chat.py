@@ -84,7 +84,7 @@ async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
         message_data.pop('room_name', None)
         await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"messages":message_data}} )
         if not room["target_user"]:
-            await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"target_user":message_data["target_user"]}} )
+            await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$set": {"target_user":message_data["target_user"]}} )
         return True
 
     except Exception as e:

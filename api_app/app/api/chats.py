@@ -37,8 +37,8 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     await upload_message_to_room(db,message_data)
                     #print("\n\t", message_data[0], "\n\t")
                     #print("\n\t", message_data,  "\n")
-                    
-                    all_messages.append(message_data[0])
+                    all_messages = await get_messages(db, room_name)
+                    #all_messages.append(message_data[0])
                     #print("\n\t", all_messages, "\n\t")
                     await manager.broadcast(all_messages)
             else:
