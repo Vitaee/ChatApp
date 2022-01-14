@@ -10,11 +10,9 @@ from core.auth_bearer import JwtBearer
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token
 from crud.user import create_user, check_free_email, get_filtered_users, get_messages, get_user
-from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse
+from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse, ListUser
 from models.token import TokenResponse
-
 router = APIRouter()
-
 @router.post("/user/register", response_model=UserInResponse, tags=["Authentication"], name="Registration")
 async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailStr = Body(...), password: str = Body(...), username: str = Body(...), file: UploadFile = File(...)):
     await check_free_email(db, email=email)
@@ -59,15 +57,16 @@ async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_u
     current_user =  await get_user(db, field="username", value=current_username) 
     return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(current_user))
 
-@router.post("/user/filter/{query}", response_model=UserBase, name="Get all users")
-async def filter_users(query: str, db:AsyncIOMotorClient=Depends(get_database), current_user: str = Header(None)  ):
+@router.post("/user/filter/{query}", name="Get all users")
+async def filter_users(query: str, db:AsyncIOMotorClient=Depends(get_database), current_user: str = Header(None) ):
     finded_users = None
+
     if current_user:
         finded_users = await get_filtered_users(db, query )
 
     if finded_users:
-        res = UserBase(**finded_users["result"][0])
-        return JSONResponse(status_code = HTTP_200_OK, content = [res.dict()] )
+        res = ListUser(**finded_users)
+        return JSONResponse(status_code = HTTP_200_OK, content = res.dict()["result"] )
     else:
         return JSONResponse(status_code = HTTP_404_NOT_FOUND, content={"error":"User not found!"})
 

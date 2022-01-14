@@ -12,7 +12,11 @@ class UserBase(BaseModel):
     username : str
     email : Optional[EmailStr] = None
     image :Optional[str] = ""
-    
+
+class ListUser(BaseModel):
+    result: List[UserBase]
+
+
 class User(BaseModel):
     token : str
 

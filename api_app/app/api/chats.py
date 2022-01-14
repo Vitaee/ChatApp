@@ -19,9 +19,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
     try:
         await manager.connect(websocket, room_name)
         await insert_room(db, current_username, room_name)
-        #print("\n\t", "print all messages", "\n\t")
         all_messages = await get_messages(db, room_name)
-        #print("\n\t", all_messages, "\n\n")
         await manager.broadcast(all_messages)
 
         # wait for messages
@@ -35,11 +33,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     break
                 else:
                     await upload_message_to_room(db,message_data)
-                    #print("\n\t", message_data[0], "\n\t")
-                    #print("\n\t", message_data,  "\n")
                     all_messages = await get_messages(db, room_name)
-                    #all_messages.append(message_data[0])
-                    #print("\n\t", all_messages, "\n\t")
                     await manager.broadcast(all_messages)
             else:
                 await manager.connect(websocket, room_name)
