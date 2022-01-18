@@ -2,13 +2,10 @@ import 'dart:convert';
 
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/models/message_data.dart';
-import 'package:auth_app/models/private_messages.dart';
-
 import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({Key? key}) : super(key: key);
@@ -19,11 +16,7 @@ class MessagesPage extends StatefulWidget {
 
 class _MessagesPageState extends State<MessagesPage> {
   Future<List<MessageData>> getChats() async {
-    //This future will get current user's chats with others."
     final Dio dio = Dio();
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? jwt = prefs.getString("jwt");
     BaseOptions options = BaseOptions(
         responseType: ResponseType.plain,
         headers: {"Current-User": globals.currentUsername});

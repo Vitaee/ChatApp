@@ -103,6 +103,8 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -121,6 +123,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
                       parsed.map((e) => DirectMessages.fromJson(e)).toList();
 
                   return ListView.builder(
+                      controller: _scrollController,
                       itemBuilder: (context, index) {
                         if (list[index].data != null) {
                           if (list[index].user == widget.sourceUser) {
@@ -208,6 +211,11 @@ class _MessageSendBarState extends State<MessageSendBar> {
     if (text_controller.text.isNotEmpty) {
       widget.channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "message_seen_by_tuser":"false", "date_sended":"${DateTime.now()}" }]');
+
+      //WebSocketChannel channel2 = IOWebSocketChannel.connect("url");
+      //channel2.sink.add("");
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
 
       text_controller.clear();
     }
