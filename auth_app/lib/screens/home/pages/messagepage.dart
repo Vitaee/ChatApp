@@ -4,49 +4,28 @@ import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class MessagesPage extends StatefulWidget {
-  const MessagesPage({Key? key}) : super(key: key);
+  MessagesPage({Key? key}) : super(key: key);
+  final WebSocketChannel listen_messsage = globals.listen_message;
 
   @override
   _MessagesPageState createState() => _MessagesPageState();
 }
 
 class _MessagesPageState extends State<MessagesPage> {
-  Future<List<MessageData>> getChats() async {
-    final Dio dio = Dio();
-    BaseOptions options = BaseOptions(
-        responseType: ResponseType.plain,
-        headers: {"Current-User": globals.currentUsername});
-    dio.options = options;
-
-    try {
-      final res = await dio.get("http://10.80.1.165:8080/api/user/chats/");
-      if (res.statusCode == 404) {
-        return [];
-      }
-
-      final List parsed = json.decode(res.data)["chats"];
-
-      List<MessageData> list =
-          parsed.map((e) => MessageData.fromJson(e)).toList();
-
-      return list;
-    } on Exception catch (e) {
-      //print(e);
-      return [];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: getChats(),
+    return StreamBuilder(
+      stream: widget.listen_messsage.stream,
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
           if (snapshot.data.length >= 1) {
+            List parsed = json.decode(snapshot.data)["chats"];
+            List<MessageData> list =
+                parsed.map((e) => MessageData.fromJson(e)).toList();
             return CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
@@ -55,9 +34,9 @@ class _MessagesPageState extends State<MessagesPage> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      return _MessageTile(messageData: snapshot.data[index]);
+                      return _MessageTile(messageData: list[index]);
                     },
-                    childCount: snapshot.data.length,
+                    childCount: list.length,
                   ),
                 )
               ],
@@ -85,6 +64,12 @@ class _MessagesPageState extends State<MessagesPage> {
         }
       },
     );
+  }
+
+  @override
+  void dispose() {
+    widget.listen_messsage.sink.close();
+    super.dispose();
   }
 }
 
@@ -160,7 +145,7 @@ class _MessageTile extends StatelessWidget {
                     ),
                     Center(
                         child: Text(
-                      "2",
+                      "2", // this data should be dynamic
                       style: TextStyle(color: Colors.white),
                     )),
                   ],
@@ -175,12 +160,25 @@ class _MessageTile extends StatelessWidget {
 
   Widget _buildLastMessage() {
     // check if message sender == current user.
-    return Text(messageData.lastMessage.toString(),
+    if (messageData.recvUsername == globals.currentUsername) {
+      // other user should be dynamic.
+      return Text(
+        "Other User: " + messageData.lastMessage.toString(),
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-          fontSize: 12,
-          color: Colors.white,
-        ));
+            fontSize: 12,
+            color: messageData.sawbyUser.toString() == 'false'
+                ? Colors.red
+                : Colors.white),
+      );
+    } else {
+      return Text("You" + ": " + messageData.lastMessage.toString(),
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.white,
+          ));
+    }
   }
 
   Widget _buildLastMessageAt() {

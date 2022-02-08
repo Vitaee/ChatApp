@@ -5,7 +5,6 @@ import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/models/user.dart';
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
-import 'package:auth_app/services/scrapusers.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -44,7 +43,7 @@ class SearchUser extends SearchDelegate {
       dio.options = options;
 
       final res = await dio
-          .post("http://10.80.1.165:8080/api/user/filter" + "/" + "$query");
+          .post("http://10.80.1.167:8080/api/user/filter" + "/" + "$query");
 
       final List parsed = json.decode(res.data);
       List<User> list = parsed.map((e) => User.fromJson(e)).toList();
@@ -73,7 +72,7 @@ class SearchUser extends SearchDelegate {
                         children: [
                           Avatar.medium(
                               url: snapshot.data[index].image.replaceAll(
-                                  'localhost', 'http://10.80.1.165')),
+                                  'localhost', 'http://10.80.1.167')),
                           SizedBox(width: 20),
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

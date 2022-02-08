@@ -5,7 +5,7 @@ import 'package:auth_app/models/user.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
 
 class FetchUser {
-  String fetchUrl = "http://10.80.1.165:8080/api/user/filter";
+  String fetchUrl = "http://10.80.1.167:8080/api/user/filter";
 
   Future<List<User>> getUserList(String query) async {
     try {

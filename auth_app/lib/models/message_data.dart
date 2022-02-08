@@ -22,7 +22,7 @@ class MessageData {
     lastMessageDate = json['lastMessageDate'];
     profilePic = json['profilePic'];
     //isOnline = json['is_online'];
-    sawbyUser = json['message_seen_by_tuser'];
+    sawbyUser = json['msg_saw_by_tusr'];
     currentUser = json['currentUser'];
   }
 
@@ -33,7 +33,7 @@ class MessageData {
     data['lastMessageDate'] = this.lastMessageDate;
     data['profilePic'] = this.profilePic;
     //data['is_online'] = this.isOnline;
-    data['message_seen_by_tuser'] = this.sawbyUser;
+    data['msg_saw_by_tusr'] = this.sawbyUser;
     data['currentUser'] = this.currentUser;
     return data;
   }

@@ -4,7 +4,7 @@ class DirectMessages {
   String? room_name;
   String? user;
   String? target_user;
-  String? message_seen_by_tuser;
+  String? msg_saw_by_tusr;
   String date_sended;
 
   DirectMessages(
@@ -13,7 +13,7 @@ class DirectMessages {
       this.room_name,
       this.user,
       this.target_user,
-      this.message_seen_by_tuser,
+      this.msg_saw_by_tusr,
       required this.date_sended});
 
   factory DirectMessages.fromJson(Map<String, dynamic> json) => DirectMessages(
@@ -22,7 +22,7 @@ class DirectMessages {
       room_name: json["room_name"],
       user: json["user"],
       target_user: json["target_user"],
-      message_seen_by_tuser: json["message_seen_by_tuser"],
+      msg_saw_by_tusr: json["msg_saw_by_tusr"],
       date_sended: json["date_sended"]);
 
   Map<String, dynamic> toJson() {
@@ -32,7 +32,7 @@ class DirectMessages {
     data['room_name'] = this.room_name;
     data['user'] = this.user;
     data['target_user'] = this.target_user;
-    data['nessage_seen_by_tuser'] = this.message_seen_by_tuser;
+    data['msg_saw_by_tusr'] = this.msg_saw_by_tusr;
     data['date_sended'] = this.date_sended;
     return data;
   }

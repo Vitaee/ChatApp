@@ -3,12 +3,15 @@ import 'dart:convert';
 
 import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/common/glowing_action_button.dart';
+import 'package:auth_app/common/notifications.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/models/private_messages.dart';
+import 'package:auth_app/screens/home/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:auth_app/common/myglobals.dart' as globals;
 
 class ChatScreen extends StatelessWidget {
   static Route route(MessageData data) => MaterialPageRoute(
@@ -93,7 +96,7 @@ class MessageSendBar extends StatefulWidget {
   //List<dynamic>? data;
 
   late WebSocketChannel channel =
-      IOWebSocketChannel.connect("ws://10.80.1.165:8080/api/chat/$roomName/",
+      IOWebSocketChannel.connect("ws://10.80.1.167:8080/api/chat/$roomName/",
           //"ws://192.168.254.4:8080/api/chat/$roomName/",
           headers: {"Current-User": sourceUser});
 
@@ -105,6 +108,24 @@ class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
   ScrollController _scrollController = ScrollController();
 
+  // write func to update saw messages by target user.
+  /*Future updateSeenMessage() async {
+  
+  }*/
+
+  @override
+  void initState() {
+    super.initState();
+
+    Notif.init();
+    listenNotifications();
+  }
+
+  void listenNotifications() =>
+      Notif.onNotifications.stream.listen(onClickedNotif);
+
+  void onClickedNotif(String? payload) => Navigator.of(context)
+      .push(MaterialPageRoute(builder: (context) => HomeScaffold()));
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -210,13 +231,18 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void sendData() {
     if (text_controller.text.isNotEmpty) {
       widget.channel.sink.add(
-          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "message_seen_by_tuser":"false", "date_sended":"${DateTime.now()}" }]');
-
-      //WebSocketChannel channel2 = IOWebSocketChannel.connect("url");
-      //channel2.sink.add("");
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}" }]');
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
 
+      // send new message for notification
+      globals.listen_message.sink.add(
+          '[ { "newMessage":"${text_controller.text}", "targetUser":"${widget.targetUser}", "sourceUser":"${widget.sourceUser}" ,  "date_sended":"${DateTime.now()}" }  } ]');
+
+      Notif.showNotif(
+          title: widget.sourceUser,
+          body: text_controller.text,
+          payload: 'dynamic payload');
       text_controller.clear();
     }
   }

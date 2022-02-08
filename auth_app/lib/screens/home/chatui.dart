@@ -1,4 +1,3 @@
-import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/screens/home/pages/messagepage.dart';
 import 'package:auth_app/screens/search/searchui.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,7 @@ class ChatScreen extends StatelessWidget {
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
   final ValueNotifier<String> title = ValueNotifier('Messages');
 
-  final pages = const [
+  final pages = [
     MessagesPage(),
     //SearchPage(),
     //ProfilePage(),
