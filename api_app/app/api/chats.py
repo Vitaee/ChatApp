@@ -70,7 +70,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                 message_data = json.loads(data)
                 # Write func. which send notify to target user
                 # await send_notify(db, message_data) 
-                latest_data = await get_messages_of_user(db, current_user) #message_data[0]['target_user'])
+                latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
                 await manager_for_home.broadcast(latest_data)
             else:
                 await manager_for_home.connect(websocket, current_user)
@@ -100,7 +100,7 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
             get_target_user = await db["chat-app"]["users"].find_one( {'username':target_user} )
 
             to_response = {}
-            to_response["recvUsername"] = target_user
+            to_response['recvUsername1'] = target_user
           
             if to_other_username["messages"][-1]["user"] == target_user:
                 # target user's last message
@@ -110,10 +110,13 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
                 to_response["lastMessage"] = to_other_username["messages"][-1]["data"]
             
             to_response["lastMessageDate"] = to_other_username["messages"][-1]["date_sended"]
+
+            to_response["recvUsername"] = to_other_username["messages"][-1]["target_user"]  
             #to_response["recvUsername"] = to_other_username["messages"][-1]["target_user"]
             to_response["msg_saw_by_tusr"] = to_other_username["messages"][-1]["msg_saw_by_tusr"]
             to_response["currentUser"] = current_user
             to_response["profilePic"] = get_target_user["image"]
+            #to_response["profilePic1"] = get_target_user["image"]
             
             print("\n", to_response, "\n")
             chat_response["chats"].append(to_response)
@@ -131,6 +134,7 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
             to_response = {}
             #to_response['recvUsername1'] = target_user
             to_response["recvUsername"] = to_target_username["target_user"]  #target_user #to_target_username["target_user"]
+            to_response['recvUsername1'] = target_user
             if to_target_username["messages"][-1]["user"] == target_user:
                 # target user's last message
                 to_response["lastMessage"] = to_target_username["messages"][-1]["data"]

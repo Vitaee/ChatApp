@@ -437,9 +437,9 @@ class _AppBarTitle extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                //globals.currentUsername == messageData.recvUsername.toString()
-                //   ? messageData.recvUsername1.toString()
-                messageData.recvUsername.toString(),
+                globals.currentUsername == messageData.recvUsername.toString()
+                    ? messageData.recvUsername1.toString()
+                    : messageData.recvUsername.toString(),
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 14),
               ),

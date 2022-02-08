@@ -127,9 +127,10 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        messageData.recvUsername.toString(),
-                        //? messageData.recvUsername1.toString()
-                        //: messageData.recvUsername.toString(),
+                        //messageData.recvUsername.toString(),
+                        globals.currentUsername == messageData.recvUsername
+                            ? messageData.recvUsername1.toString()
+                            : messageData.recvUsername.toString(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,
@@ -179,7 +180,7 @@ class _MessageTile extends StatelessWidget {
                                 messageData.recvUsername.toString()
                             ? messageData.recvUsername1.toString()
                             : messageData.recvUsername.toString(),*/
-    if (messageData.currentUser != globals.currentUsername) {
+    if (messageData.recvUsername1 != globals.currentUsername) {
       // other user should be dynamic.
       return Text(
         "Other User: " + messageData.lastMessage.toString(),
