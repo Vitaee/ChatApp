@@ -27,8 +27,8 @@ class SocketManager:
         for connection in self.active_connections:
             await connection[0].send_json(data)    
 
-manager = SocketManager()
-
+manager_for_room = SocketManager()
+manager_for_home = SocketManager()
 async def insert_room(db: AsyncIOMotorClient, username, room_name):
     "insert room for both users."
     room = {}

@@ -9,6 +9,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class MessagesPage extends StatefulWidget {
   MessagesPage({Key? key}) : super(key: key);
+
   final WebSocketChannel listen_messsage = globals.listen_message;
 
   @override
@@ -24,6 +25,7 @@ class _MessagesPageState extends State<MessagesPage> {
         if (snapshot.connectionState != ConnectionState.waiting) {
           if (snapshot.data.length >= 1) {
             List parsed = json.decode(snapshot.data)["chats"];
+
             List<MessageData> list =
                 parsed.map((e) => MessageData.fromJson(e)).toList();
             return CustomScrollView(
@@ -68,8 +70,8 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   void dispose() {
-    widget.listen_messsage.sink.close();
     super.dispose();
+    widget.listen_messsage.sink.close();
   }
 }
 

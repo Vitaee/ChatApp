@@ -6,7 +6,7 @@ from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
 from core.auth_bearer import JwtBearer
 from crud.user import get_messages
 from db.mongosdb import get_database
-from crud.chat import insert_room, manager, upload_message_to_room
+from crud.chat import insert_room, manager_for_room,manager_for_home, upload_message_to_room
 from models.user import User
 import json
 from fastapi.encoders import jsonable_encoder
@@ -19,10 +19,10 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
     print("\n\t", current_user , " <-- connected.\n")
     current_username = current_user
     try:
-        await manager.connect(websocket, room_name)
+        await manager_for_room.connect(websocket, room_name)
         await insert_room(db, current_username, room_name)
         all_messages = await get_messages(db, room_name)
-        await manager.broadcast(all_messages)
+        await manager_for_room.broadcast(all_messages)
 
         # wait for messages
         while True:
@@ -31,23 +31,23 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                 message_data = json.loads(data)
                
                 if "type" in message_data and message_data["type"] == "dismissal":
-                    await manager.disconnect(websocket, room_name)
+                    await manager_for_room.disconnect(websocket, room_name)
                     break
                 else:
                     await upload_message_to_room(db,message_data)
                     # Write func. which send notify to target user
                     # await send_notify(db, message_data) 
                     all_messages = await get_messages(db, room_name)
-                    await manager.broadcast(all_messages)
+                    await manager_for_room.broadcast(all_messages)
             else:
-                await manager.connect(websocket, room_name)
+                await manager_for_room.connect(websocket, room_name)
 
     except Exception as e:
         print("\n")
         print("\tcould not connect --> ", e)
         print(type(e).__name__, e.args, e.__repr__)
         print("\n")
-        manager.disconnect(websocket, room_name)
+        manager_for_room.disconnect(websocket, room_name)
 
 @router.websocket("/chats")
 async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, current_user: str = Header(None)):
@@ -61,9 +61,9 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
     # check if message sended to this user.
 
     try:
-        await manager.connect(websocket, current_user)
+        await manager_for_home.connect(websocket, current_user)
         initial_data = await get_messages_of_user(db, current_user)
-        await manager.broadcast(initial_data) # should response with user chats
+        await manager_for_home.broadcast(initial_data) # should response with user chats
         
         # wait for messages
         while True:
@@ -74,16 +74,16 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                 # Write func. which send notify to target user
                 # await send_notify(db, message_data) 
                 latest_data = await get_messages_of_user(db, current_user)
-                await manager.broadcast(latest_data)
+                await manager_for_home.broadcast(latest_data)
             else:
-                await manager.connect(websocket, current_user)
+                await manager_for_home.connect(websocket, current_user)
 
     except Exception as e:
         print("\n")
         print("\tcould not connect --> ", e)
         print(type(e).__name__, e.args, e.__repr__)
         print("\n")
-        manager.disconnect(websocket,current_user)
+        manager_for_home.disconnect(websocket,current_user)
 
     # message count: int = 0 
     # target user: str = "Can"

@@ -235,22 +235,22 @@ class _MessageSendBarState extends State<MessageSendBar> {
       _scrollController.animateTo(_scrollController.position.maxScrollExtent,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
 
-      // send new message for notification
-      globals.listen_message.sink.add(
-          '[ { "newMessage":"${text_controller.text}", "targetUser":"${widget.targetUser}", "sourceUser":"${widget.sourceUser}" ,  "date_sended":"${DateTime.now()}" }  } ]');
-
       Notif.showNotif(
           title: widget.sourceUser,
           body: text_controller.text,
           payload: 'dynamic payload');
+      // send new message for notification
+      globals.listen_message.sink.add(
+          '[{ "newMessage":"${text_controller.text}", "targetUser":"${widget.targetUser}", "sourceUser":"${widget.sourceUser}" ,  "date_sended":"${DateTime.now()}"   }]');
+
       text_controller.clear();
     }
   }
 
   @override
   void dispose() {
-    widget.channel.sink.close();
     super.dispose();
+    widget.channel.sink.close();
   }
 }
 
