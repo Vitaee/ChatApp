@@ -116,7 +116,10 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        messageData.recvUsername.toString(),
+                        globals.currentUsername ==
+                                messageData.recvUsername.toString()
+                            ? messageData.recvUsername1.toString()
+                            : messageData.recvUsername.toString(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,

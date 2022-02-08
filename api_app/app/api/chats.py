@@ -103,7 +103,9 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
             get_target_user = await db["chat-app"]["users"].find_one( {'username':target_user} )
 
             to_response = {}
-            to_response["recvUsername"] = to_other_username['target_user']
+
+            to_response['recvUsername1'] = target_user
+          
             if to_other_username["messages"][-1]["user"] == target_user:
                 # target user's last message
                 to_response["lastMessage"] = to_other_username["messages"][-1]["data"]
@@ -112,6 +114,7 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
                 to_response["lastMessage"] = to_other_username["messages"][-1]["data"]
             
             to_response["lastMessageDate"] = to_other_username["messages"][-1]["date_sended"]
+            to_response["recvUsername"] = to_other_username["messages"][-1]["target_user"]
             to_response["msg_saw_by_tusr"] = to_other_username["messages"][-1]["msg_saw_by_tusr"]
             to_response["currentUser"] = current_user
             to_response["profilePic"] = get_target_user["image"]
@@ -130,8 +133,8 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
             get_target_user = await db["chat-app"]["users"].find_one( {'username':target_user} )
 
             to_response = {}
-
-            to_response["recvUsername"] =  to_target_username["target_user"]
+            to_response['recvUsername1'] = target_user
+            to_response["recvUsername"] =  target_user #to_target_username["target_user"]
             if to_target_username["messages"][-1]["user"] == target_user:
                 # target user's last message
                 to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
@@ -146,6 +149,7 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
             to_response["msg_saw_by_tusr"] = to_target_username["messages"][-1]["msg_saw_by_tusr"]
             to_response["currentUser"] = current_user
             to_response["profilePic"] = get_target_user["image"]
+            #to_response["recvUsername1"] = to_target_username['target_user']
             
             chat_response["chats"].append(to_response)
             return  jsonable_encoder(chat_response)#JSONResponse(status_code=HTTP_200_OK, content = chat_response)

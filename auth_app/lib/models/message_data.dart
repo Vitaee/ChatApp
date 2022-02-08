@@ -6,12 +6,14 @@ class MessageData {
   //bool? isOnline;
   String? sawbyUser;
   String? currentUser;
+  String? recvUsername1;
 
   MessageData(
       {this.recvUsername,
       this.lastMessage,
       this.lastMessageDate,
       this.profilePic,
+      this.recvUsername1,
       //this.isOnline,
       this.sawbyUser,
       this.currentUser});
@@ -24,11 +26,13 @@ class MessageData {
     //isOnline = json['is_online'];
     sawbyUser = json['msg_saw_by_tusr'];
     currentUser = json['currentUser'];
+    recvUsername1 = json['recvUsername1'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['recvUsername'] = this.recvUsername;
+    data['recvUsername1'] = this.recvUsername1;
     data['lastMessage'] = this.lastMessage;
     data['lastMessageDate'] = this.lastMessageDate;
     data['profilePic'] = this.profilePic;

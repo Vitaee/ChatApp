@@ -75,7 +75,7 @@ class ChatScreen extends StatelessWidget {
       ),
       body: MessageSendBar(
           roomName: "room1",
-          sourceUser: messageData.currentUser!,
+          sourceUser: globals.currentUsername,
           targetUser: messageData.recvUsername),
     );
   }
