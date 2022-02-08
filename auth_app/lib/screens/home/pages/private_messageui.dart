@@ -241,7 +241,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
           payload: 'dynamic payload');
       // send new message for notification
       globals.listen_message.sink.add(
-          '[{ "newMessage":"${text_controller.text}", "targetUser":"${widget.targetUser}", "sourceUser":"${widget.sourceUser}" ,  "date_sended":"${DateTime.now()}"   }]');
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');
 
       text_controller.clear();
     }
@@ -429,7 +429,9 @@ class _AppBarTitle extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                messageData.recvUsername!,
+                globals.currentUsername == messageData.recvUsername.toString()
+                    ? messageData.recvUsername1.toString()
+                    : messageData.recvUsername.toString(),
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 14),
               ),
