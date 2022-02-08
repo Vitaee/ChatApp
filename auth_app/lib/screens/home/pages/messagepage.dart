@@ -165,7 +165,11 @@ class _MessageTile extends StatelessWidget {
 
   Widget _buildLastMessage() {
     // check if message sender == current user.
-    if (messageData.recvUsername == globals.currentUsername) {
+    /* globals.currentUsername ==
+                                messageData.recvUsername.toString()
+                            ? messageData.recvUsername1.toString()
+                            : messageData.recvUsername.toString(),*/
+    if (messageData.recvUsername1 == globals.currentUsername) {
       // other user should be dynamic.
       return Text(
         "Other User: " + messageData.lastMessage.toString(),

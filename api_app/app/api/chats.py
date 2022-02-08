@@ -73,7 +73,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                 message_data = json.loads(data)
                 # Write func. which send notify to target user
                 # await send_notify(db, message_data) 
-                latest_data = await get_messages_of_user(db, message_data['target_user'])
+                latest_data = await get_messages_of_user(db, message_data[0]['target_user'])
                 await manager_for_home.broadcast(latest_data)
             else:
                 await manager_for_home.connect(websocket, current_user)
