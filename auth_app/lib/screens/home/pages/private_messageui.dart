@@ -14,18 +14,21 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
 
 class ChatScreen extends StatelessWidget {
-  static Route route(MessageData data) => MaterialPageRoute(
+  static Route route(MessageData data, home_channel) => MaterialPageRoute(
         builder: (context) => ChatScreen(
           messageData: data,
+          home_channel: home_channel,
         ),
       );
 
   ChatScreen({
     Key? key,
     required this.messageData,
+    required this.home_channel,
   }) : super(key: key);
 
   final MessageData messageData;
+  final WebSocketChannel home_channel;
 
   @override
   Widget build(BuildContext context) {
@@ -76,23 +79,27 @@ class ChatScreen extends StatelessWidget {
       body: MessageSendBar(
           roomName: "room1",
           sourceUser: globals.currentUsername,
-          targetUser: messageData.recvUsername),
+          targetUser: messageData.recvUsername,
+          home_channel: home_channel),
     );
   }
 }
 
 class MessageSendBar extends StatefulWidget {
-  MessageSendBar({
-    Key? key,
-    required this.roomName,
-    required this.sourceUser,
-    required this.targetUser,
-    //required this.data})
-  }) : super(key: key);
+  MessageSendBar(
+      {Key? key,
+      required this.roomName,
+      required this.sourceUser,
+      required this.targetUser,
+      required this.home_channel
+      //required this.data})
+      })
+      : super(key: key);
 
   String roomName;
   String sourceUser;
   String? targetUser;
+  late WebSocketChannel home_channel;
   //List<dynamic>? data;
 
   late WebSocketChannel channel =
@@ -240,7 +247,8 @@ class _MessageSendBarState extends State<MessageSendBar> {
           body: text_controller.text,
           payload: 'dynamic payload');
       // send new message for notification
-      globals.listen_message.sink.add(
+      //globals.listen_message.sink.add(
+      widget.home_channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');
 
       text_controller.clear();
@@ -429,9 +437,9 @@ class _AppBarTitle extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                globals.currentUsername == messageData.recvUsername.toString()
-                    ? messageData.recvUsername1.toString()
-                    : messageData.recvUsername.toString(),
+                //globals.currentUsername == messageData.recvUsername.toString()
+                //   ? messageData.recvUsername1.toString()
+                messageData.recvUsername.toString(),
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 14),
               ),

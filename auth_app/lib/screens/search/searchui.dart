@@ -7,6 +7,7 @@ import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class SearchUser extends SearchDelegate {
   // write future to fetch other users
@@ -105,7 +106,8 @@ class SearchUser extends SearchDelegate {
                           lastMessageDate: "",
                           recvUsername: snapshot.data[index].username,
                           sawbyUser: "false");
-                      Navigator.of(context).push(ChatScreen.route(msg));
+                      Navigator.of(context)
+                          .push(ChatScreen.route(msg, WebSocketChannel));
                     },
                   );
                 },

@@ -5,13 +5,16 @@ import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class MessagesPage extends StatefulWidget {
   MessagesPage({Key? key}) : super(key: key);
 
-  final WebSocketChannel listen_messsage = globals.listen_message;
-
+  //final WebSocketChannel listen_messsage = globals.listen_message;
+  late WebSocketChannel home_channel = IOWebSocketChannel.connect(
+      "ws://10.80.1.167:8080/api/chats",
+      headers: {"Current-User": globals.currentUsername});
   @override
   _MessagesPageState createState() => _MessagesPageState();
 }
@@ -20,7 +23,7 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: widget.listen_messsage.stream,
+      stream: widget.home_channel.stream, //widget.listen_messsage.stream,
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
           if (snapshot.data.length >= 1) {
@@ -36,7 +39,10 @@ class _MessagesPageState extends State<MessagesPage> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      return _MessageTile(messageData: list[index]);
+                      return _MessageTile(
+                        messageData: list[index],
+                        home_channel: widget.home_channel,
+                      );
                     },
                     childCount: list.length,
                   ),
@@ -71,7 +77,7 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   void dispose() {
     super.dispose();
-    widget.listen_messsage.sink.close();
+    widget.home_channel.sink.close();
   }
 }
 
@@ -79,15 +85,20 @@ class _MessageTile extends StatelessWidget {
   const _MessageTile({
     Key? key,
     required this.messageData,
+    required this.home_channel,
   }) : super(key: key);
 
   final MessageData messageData;
+  final WebSocketChannel home_channel;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(ChatScreen.route(messageData));
+        Navigator.of(context).push(ChatScreen.route(
+          messageData,
+          home_channel,
+        ));
       },
       child: Container(
         height: 100,
@@ -116,10 +127,9 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        globals.currentUsername ==
-                                messageData.recvUsername.toString()
-                            ? messageData.recvUsername1.toString()
-                            : messageData.recvUsername.toString(),
+                        messageData.recvUsername.toString(),
+                        //? messageData.recvUsername1.toString()
+                        //: messageData.recvUsername.toString(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,
@@ -169,7 +179,7 @@ class _MessageTile extends StatelessWidget {
                                 messageData.recvUsername.toString()
                             ? messageData.recvUsername1.toString()
                             : messageData.recvUsername.toString(),*/
-    if (messageData.recvUsername1 == globals.currentUsername) {
+    if (messageData.currentUser != globals.currentUsername) {
       // other user should be dynamic.
       return Text(
         "Other User: " + messageData.lastMessage.toString(),
