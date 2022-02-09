@@ -83,6 +83,16 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
         manager_for_home.disconnect(websocket,current_user)
 
 
+@router.get("/user/chats/")
+async def get_messages_user(db: AsyncIOMotorClient =  Depends(get_database), current_user: str = Header(None)):
+    """This function will return current user chats with other ones."""
+    
+    chat_response = await get_messages_of_user(db, current_user)
+    if len(chat_response["chats"]) >= 1:
+        return JSONResponse(status_code=HTTP_200_OK, content = chat_response)
+    else:
+        return JSONResponse(status_code=HTTP_404_NOT_FOUND, content={"error":"Not found!"})
+
 async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), current_user: str =None):
     """This function will return current user chats with other ones."""
     chat_response = { "chats": [] }
@@ -119,7 +129,6 @@ async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), 
 
             # get other user info.
             target_user = await db["chat-app"]["users"].find_one( { 'username' :  get_username['created_by'] } )
-
             to_response["recvUsername"] = get_username["created_by"] # target_user 
             to_response['recvUsername1'] = get_username['messages'][-1]['target_user'] # last message target user
             to_response["lastMessage"] = get_username["messages"][-1]["data"] # last message
