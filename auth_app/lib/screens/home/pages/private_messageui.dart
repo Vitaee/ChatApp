@@ -438,8 +438,8 @@ class _AppBarTitle extends StatelessWidget {
             children: [
               Text(
                 globals.currentUsername == messageData.recvUsername.toString()
-                    ? messageData.recvUsername1.toString()
-                    : messageData.recvUsername.toString(),
+                    ? messageData.recvUsername.toString()
+                    : messageData.recvUsername1.toString(),
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 14),
               ),

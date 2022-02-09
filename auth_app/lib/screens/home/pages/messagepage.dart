@@ -129,8 +129,8 @@ class _MessageTile extends StatelessWidget {
                       child: Text(
                         //messageData.recvUsername.toString(),
                         globals.currentUsername == messageData.recvUsername
-                            ? messageData.recvUsername1.toString()
-                            : messageData.recvUsername.toString(),
+                            ? messageData.recvUsername.toString()
+                            : messageData.recvUsername1.toString(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,
@@ -183,21 +183,21 @@ class _MessageTile extends StatelessWidget {
     if (messageData.recvUsername1 != globals.currentUsername) {
       // other user should be dynamic.
       return Text(
-        "Other User: " + messageData.lastMessage.toString(),
+        "You: " + messageData.lastMessage.toString(),
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-            fontSize: 12,
-            color: messageData.sawbyUser.toString() == 'false'
-                ? Colors.red
-                : Colors.white),
+        style: TextStyle(fontSize: 12, color: Colors.white),
       );
     } else {
-      return Text("You" + ": " + messageData.lastMessage.toString(),
+      return Text(
+          "${messageData.recvUsername}" +
+              ": " +
+              messageData.lastMessage.toString(),
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 12,
-            color: Colors.white,
-          ));
+              fontSize: 12,
+              color: messageData.sawbyUser.toString() == 'false'
+                  ? Colors.red
+                  : Colors.white));
     }
   }
 

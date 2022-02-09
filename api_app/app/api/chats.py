@@ -82,76 +82,55 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
         print("\n")
         manager_for_home.disconnect(websocket,current_user)
 
-    # message count: int = 0 
-    # target user: str = "Can"
 
-#@router.get("/user/chats/")
 async def get_messages_of_user(db: AsyncIOMotorClient =  Depends(get_database), current_user: str =None):
     """This function will return current user chats with other ones."""
     chat_response = { "chats": [] }
-    
-    to_target_username = await db["chat-app"]["rooms"].find_one( { 'created_by' : current_user  } )
-    if not to_target_username:
-        to_other_username = await db["chat-app"]["rooms"].find_one( {'target_user':current_user} )
-        if not to_other_username:
-            raise Exception
-        try:
-            target_user = to_other_username["created_by"]
-            get_target_user = await db["chat-app"]["users"].find_one( {'username':target_user} )
 
+    # current user is which user can or sloon?
+    try:
+        get_username = await  db["chat-app"]["rooms"].find_one(  { 'created_by' : current_user }   )
+        if get_username:
+            # if current_user == can
             to_response = {}
-            to_response['recvUsername1'] = target_user
-          
-            if to_other_username["messages"][-1]["user"] == target_user:
-                # target user's last message
-                to_response["lastMessage"] = to_other_username["messages"][-1]["data"]
-            else:
-                # your last message
-                to_response["lastMessage"] = to_other_username["messages"][-1]["data"]
-            
-            to_response["lastMessageDate"] = to_other_username["messages"][-1]["date_sended"]
 
-            to_response["recvUsername"] = to_other_username["messages"][-1]["target_user"]  
-            #to_response["recvUsername"] = to_other_username["messages"][-1]["target_user"]
-            to_response["msg_saw_by_tusr"] = to_other_username["messages"][-1]["msg_saw_by_tusr"]
+            # get other user info.
+            target_user = await db["chat-app"]['users'].find_one( { 'username' :  get_username['target_user'] } )
+            to_response["recvUsername"] = get_username["target_user"] # target_user 
+            to_response['recvUsername1'] = get_username['messages'][-1]['target_user'] # last message target user
+            to_response["lastMessage"] = get_username["messages"][-1]["data"] # last message
+            to_response["lastMessageDate"] = get_username["messages"][-1]["date_sended"]
+            to_response["msg_saw_by_tusr"] = get_username["messages"][-1]["msg_saw_by_tusr"]
             to_response["currentUser"] = current_user
-            to_response["profilePic"] = get_target_user["image"]
-            #to_response["profilePic1"] = get_target_user["image"]
+            to_response["profilePic"] = target_user["image"]
             
-            print("\n", to_response, "\n")
+            #to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
+            #to_response["recvUsername"] =  to_target_username["messages"][-1]["target_user"]
+            #to_response["recvUsername1"] = to_target_username['target_user']
+    
             chat_response["chats"].append(to_response)
 
             return  jsonable_encoder(chat_response)
-        except:
-            return chat_response
 
-    else:
-        try:
-            target_user = to_target_username["target_user"]
-
-            get_target_user = await db["chat-app"]["users"].find_one( {'username':target_user} )
-
+        else:
+            # current_user = sloon
             to_response = {}
-            #to_response['recvUsername1'] = target_user
-            to_response["recvUsername"] = to_target_username["target_user"]  #target_user #to_target_username["target_user"]
-            to_response['recvUsername1'] = target_user
-            if to_target_username["messages"][-1]["user"] == target_user:
-                # target user's last message
-                to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
-              
-            else:
-                # your last message
-                to_response["lastMessage"] = to_target_username["messages"][-1]["data"]
-                #to_response["recvUsername"] =  to_target_username["messages"][-1]["target_user"]
+            get_username = await  db["chat-app"]["rooms"].find_one(  { 'target_user' : current_user }   )
 
+            # get other user info.
+            target_user = await db["chat-app"]["users"].find_one( { 'username' :  get_username['created_by'] } )
 
-            to_response["lastMessageDate"] = to_target_username["messages"][-1]["date_sended"]
-            to_response["msg_saw_by_tusr"] = to_target_username["messages"][-1]["msg_saw_by_tusr"]
+            to_response["recvUsername"] = get_username["created_by"] # target_user 
+            to_response['recvUsername1'] = get_username['messages'][-1]['target_user'] # last message target user
+            to_response["lastMessage"] = get_username["messages"][-1]["data"] # last message
+            to_response["lastMessageDate"] = get_username["messages"][-1]["date_sended"]
+            to_response["msg_saw_by_tusr"] = get_username["messages"][-1]["msg_saw_by_tusr"]
             to_response["currentUser"] = current_user
-            to_response["profilePic"] = get_target_user["image"]
-            #to_response["recvUsername1"] = to_target_username['target_user']
-            
+            to_response["profilePic"] = target_user["image"]
+
             chat_response["chats"].append(to_response)
-            return  jsonable_encoder(chat_response)#JSONResponse(status_code=HTTP_200_OK, content = chat_response)
-        except:
-            return chat_response #JSONResponse(status_code=HTTP_404_NOT_FOUND, content={"error":"Not found!"})
+
+            return jsonable_encoder(chat_response)
+
+    except Exception as e:
+        return chat_response
