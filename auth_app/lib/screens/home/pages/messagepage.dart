@@ -53,10 +53,10 @@ class _MessagesPageState extends State<MessagesPage> {
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
           if (snapshot.data.length >= 1) {
-            List parsed = json.decode(snapshot.data)["chats"];
+            //List parsed = json.decode(snapshot.data)["chats"];
 
-            List<MessageData> list =
-                parsed.map((e) => MessageData.fromJson(e)).toList();
+            //List<MessageData> list =
+            //    parsed.map((e) => MessageData.fromJson(e)).toList();
 
             return FutureBuilder(
                 future: getChats(),
@@ -73,11 +73,11 @@ class _MessagesPageState extends State<MessagesPage> {
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
                                 return _MessageTile(
-                                  messageData: list[index],
+                                  messageData: snapshot.data[index],
                                   home_channel: widget.home_channel,
                                 );
                               },
-                              childCount: list.length,
+                              childCount: snapshot.data.length,
                             ),
                           )
                         ],
@@ -190,10 +190,10 @@ class _MessageTile extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
-                        //messageData.recvUsername.toString(),
-                        globals.currentUsername == messageData.recvUsername
-                            ? messageData.recvUsername.toString()
-                            : messageData.recvUsername1.toString(),
+                        messageData.recvUsername.toString(),
+                        //globals.currentUsername == messageData.recvUsername
+                        //    ? messageData.recvUsername.toString()
+                        //    : messageData.recvUsername1.toString(),
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                             letterSpacing: 0.2,
@@ -243,7 +243,7 @@ class _MessageTile extends StatelessWidget {
                                 messageData.recvUsername.toString()
                             ? messageData.recvUsername1.toString()
                             : messageData.recvUsername.toString(),*/
-    if (messageData.recvUsername1 != globals.currentUsername) {
+    if (messageData.recvUsername != globals.currentUsername) {
       // other user should be dynamic.
       return Text(
         "You: " + messageData.lastMessage.toString(),
