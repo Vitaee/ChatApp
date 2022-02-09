@@ -243,7 +243,7 @@ class _MessageTile extends StatelessWidget {
                                 messageData.recvUsername.toString()
                             ? messageData.recvUsername1.toString()
                             : messageData.recvUsername.toString(),*/
-    if (messageData.recvUsername != globals.currentUsername) {
+    if (messageData.recvUsername1 != globals.currentUsername) {
       // other user should be dynamic.
       return Text(
         "You: " + messageData.lastMessage.toString(),
