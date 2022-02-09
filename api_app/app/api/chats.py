@@ -60,6 +60,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
     try:
         await manager_for_home.connect(websocket, current_user)
         initial_data = await get_messages_of_user(db, current_user)
+        print("\n\n\n", initial_data, "\n\n")
         await manager_for_home.broadcast(initial_data) # should response with user chats
         
         # wait for messages

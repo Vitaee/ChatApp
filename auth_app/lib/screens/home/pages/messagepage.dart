@@ -4,6 +4,7 @@ import 'package:auth_app/common/avatar.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
+import 'package:auth_app/services/scrapchats.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
@@ -13,9 +14,9 @@ class MessagesPage extends StatefulWidget {
   MessagesPage({Key? key}) : super(key: key);
 
   //final WebSocketChannel listen_messsage = globals.listen_message;
-  late WebSocketChannel home_channel = IOWebSocketChannel.connect(
-      "ws://10.80.1.167:8080/api/chats",
-      headers: {"Current-User": globals.currentUsername});
+  //late WebSocketChannel home_channel = IOWebSocketChannel.connect(
+  //   "ws://10.80.1.167:8080/api/chats",
+  //   headers: {"Current-User": globals.currentUsername});
   @override
   _MessagesPageState createState() => _MessagesPageState();
 }
@@ -46,53 +47,100 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
+  WebSocketChannel? home_channel;
+
+  @override
+  void initState() {
+    home_channel = IOWebSocketChannel.connect("ws://10.80.1.167:8080/api/chats",
+        headers: {"Current-User": globals.currentUsername});
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: widget.home_channel.stream, //widget.listen_messsage.stream,
+      stream: home_channel!
+          .stream, //widget.home_channel.stream, //widget.listen_messsage.stream,
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
           if (snapshot.data.length >= 1) {
-            //List parsed = json.decode(snapshot.data)["chats"];
+            List parsed = json.decode(snapshot.data)["chats"];
+            List<MessageData> list =
+                parsed.map((e) => MessageData.fromJson(e)).toList();
 
-            //List<MessageData> list =
-            //    parsed.map((e) => MessageData.fromJson(e)).toList();
-
-            return FutureBuilder(
-                future: getChats(),
-                builder:
-                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.connectionState != ConnectionState.waiting) {
-                    if (snapshot.data.length >= 1) {
-                      return CustomScrollView(
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: _Stories(),
-                          ),
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                return _MessageTile(
+            return Stack(
+              children: [
+                Align(
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: _Stories(),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.topCenter,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 145.0),
+                  child: MessageTiles(home_channel: home_channel!),
+                )
+              ],
+            );
+            /*return CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _Stories(),
+                ),
+                /*SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return MessageTiles(
+                        //messageData: list[index],
+                        home_channel: home_channel!,
+                      );
+                    },
+                    childCount: list.length,
+                  ),
+                )*/
+              ],
+              
+            );*/
+            /*return FutureBuilder(
+              future: getChats(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.connectionState != ConnectionState.waiting) {
+                  if (snapshot.data.length >= 1) {
+                    return CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: _Stories(),
+                        ),
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return _MessageTile(
                                   messageData: snapshot.data[index],
-                                  home_channel: widget.home_channel,
-                                );
-                              },
-                              childCount: snapshot.data.length,
-                            ),
-                          )
-                        ],
-                      );
-                    } else {
-                      return Center(
-                        child: Text("empty from Future builder."),
-                      );
-                    }
+                                  home_channel:
+                                      home_channel! //widget.home_channel,
+                                  );
+                            },
+                            childCount: snapshot.data.length,
+                          ),
+                        )
+                      ],
+                    );
                   } else {
                     return Center(
-                      child: CircularProgressIndicator(),
+                      child: Text("empty from Future builder."),
                     );
                   }
-                });
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            );*/
 
             /*return CustomScrollView(
               slivers: [
@@ -140,7 +188,162 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   void dispose() {
     super.dispose();
-    widget.home_channel.sink.close();
+    home_channel!.sink.close();
+    //widget.home_channel.sink.close();
+  }
+}
+
+class MessageTiles extends StatefulWidget {
+  const MessageTiles({Key? key, required this.home_channel}) : super(key: key);
+  final WebSocketChannel home_channel;
+  @override
+  _MessageTilesState createState() => _MessageTilesState();
+}
+
+class _MessageTilesState extends State<MessageTiles> {
+  //late final Future myFuture;
+
+  @override
+  void initState() {
+    //myFuture = getChats();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: getChats(), //myFuture,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.connectionState != ConnectionState.waiting) {
+            if (snapshot.data.length >= 1) {
+              return CustomScrollView(slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    return InkWell(
+                      onTap: () => {
+                        Navigator.of(context).push(ChatScreen.route(
+                            snapshot.data[index], widget.home_channel))
+                      },
+                      child: Container(
+                        height: 100,
+                        margin: EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Theme.of(context).dividerColor,
+                              width: 0.5,
+                            ),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Avatar.medium(
+                                  url: snapshot.data[index].profilePic,
+                                ),
+                              ),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Text(
+                                        snapshot.data[index].recvUsername,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            letterSpacing: 0.2,
+                                            wordSpacing: 1.5,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 20,
+                                      child: lastMessage(snapshot.data[index]),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(right: 20.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    SizedBox(
+                                      height: 4,
+                                    ),
+                                    lastMessageDate(snapshot.data[index]),
+                                    SizedBox(
+                                      height: 8,
+                                    ),
+                                    Center(
+                                      child: Text(
+                                        "2",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }, childCount: snapshot.data.length),
+                )
+              ]);
+            } else {
+              return Center(
+                child: Text(
+                  "Text with someone!",
+                ),
+              );
+            }
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        });
+  }
+
+  Widget lastMessage(dynamic data) {
+    if (data.recvUsername1 != globals.currentUsername) {
+      return Text("You: " + data.lastMessage.toString(),
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.white,
+          ));
+    } else {
+      return Text("${data.recvUsername}" + ": " + data.lastMessage.toString(),
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+              fontSize: 12,
+              color: data.sawbyUser.toString() == 'false'
+                  ? Colors.red
+                  : Colors.white));
+    }
+  }
+
+  Widget lastMessageDate(dynamic data) {
+    return Text(
+      data.lastMessageDate.toString().split(" ")[0],
+      style: const TextStyle(
+        fontSize: 11,
+        letterSpacing: -0.2,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+      ),
+    );
   }
 }
 
