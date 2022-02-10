@@ -9,6 +9,7 @@ import 'package:auth_app/models/private_messages.dart';
 import 'package:auth_app/screens/home/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
@@ -113,7 +114,8 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController =
+      ScrollController(initialScrollOffset: 0);
 
   // write func to update saw messages by target user.
   /*Future updateSeenMessage() async {
@@ -123,6 +125,14 @@ class _MessageSendBarState extends State<MessageSendBar> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      //_scrollController.animateTo(_scrollController.position.maxScrollExtent,
+      //   duration: Duration(milliseconds: 100), curve: Curves.easeOut);
+      //SchedulerBinding.instance!.addPostFrameCallback((_) {
+      //  _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      // });
+    });
 
     Notif.init();
     listenNotifications();
@@ -149,29 +159,33 @@ class _MessageSendBarState extends State<MessageSendBar> {
 
                   List<DirectMessages> list =
                       parsed.map((e) => DirectMessages.fromJson(e)).toList();
+                  //if (list.length >= 1) {
+                  //  scrollIt();
+                  //}
 
                   return ListView.builder(
-                      controller: _scrollController,
-                      itemBuilder: (context, index) {
-                        if (list[index].data != null) {
-                          if (list[index].user == widget.sourceUser) {
-                            return _MessageOwnTile(
-                                message: list[index].data.toString(),
-                                messageDate:
-                                    list[index].date_sended.split(" ")[1]);
-                          } else {
-                            return _MessageTile(
-                                message: list[index].data.toString(),
-                                messageDate:
-                                    list[index].date_sended.split(" ")[1]);
-                          }
+                    controller: _scrollController,
+                    itemBuilder: (context, index) {
+                      if (list[index].data != null) {
+                        if (list[index].user == widget.sourceUser) {
+                          return _MessageOwnTile(
+                              message: list[index].data.toString(),
+                              messageDate:
+                                  list[index].date_sended.split(" ")[1]);
                         } else {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
+                          return _MessageTile(
+                              message: list[index].data.toString(),
+                              messageDate:
+                                  list[index].date_sended.split(" ")[1]);
                         }
-                      },
-                      itemCount: snapshot.data != null ? list.length : 0);
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    },
+                    itemCount: snapshot.data != null ? list.length : 0,
+                  );
                 } else {
                   return Center(
                     child: CircularProgressIndicator(),
@@ -239,19 +253,21 @@ class _MessageSendBarState extends State<MessageSendBar> {
     if (text_controller.text.isNotEmpty) {
       widget.channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}" }]');
-      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
 
-      Notif.showNotif(
+      /*Notif.showNotif(
           title: widget.sourceUser,
           body: text_controller.text,
-          payload: 'dynamic payload');
+          payload: 'dynamic payload');*/
       // send new message for notification
       //globals.listen_message.sink.add(
       widget.home_channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');
 
       text_controller.clear();
+      _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent + 85,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut);
     }
   }
 
