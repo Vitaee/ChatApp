@@ -44,6 +44,8 @@ dependencies:
   web_socket_channel: ^2.1.0
   flutter_local_notifications: ^9.2.0
   rxdart: ^0.27.3
+  agora_rtc_engine: ^4.2.1
+  permission_handler: ^9.0.1
 
 
 

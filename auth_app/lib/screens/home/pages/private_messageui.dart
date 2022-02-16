@@ -7,12 +7,15 @@ import 'package:auth_app/common/notifications.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/models/private_messages.dart';
 import 'package:auth_app/screens/home/home.dart';
+import 'package:auth_app/screens/home/pages/voicecallui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ChatScreen extends StatelessWidget {
   static Route route(MessageData data, home_channel) => MaterialPageRoute(
@@ -68,10 +71,15 @@ class ChatScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 20),
             child: Center(
-              child: Icon(
-                CupertinoIcons.phone_solid,
-                size: 26,
-                //onTap: () {},
+              child: InkWell(
+                child: Icon(
+                  CupertinoIcons.phone_solid,
+                  size: 26,
+                ),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => VoiceCallUI()));
+                },
               ),
             ),
           ),
@@ -126,13 +134,11 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
-      //_scrollController.animateTo(_scrollController.position.maxScrollExtent,
-      //   duration: Duration(milliseconds: 100), curve: Curves.easeOut);
-      //SchedulerBinding.instance!.addPostFrameCallback((_) {
-      //  _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      // });
-    });
+    //_scrollController.animateTo(_scrollController.position.maxScrollExtent,
+    //   duration: Duration(milliseconds: 100), curve: Curves.easeOut);
+    //SchedulerBinding.instance!.addPostFrameCallback((_) {
+    //  _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    // });
 
     Notif.init();
     listenNotifications();
