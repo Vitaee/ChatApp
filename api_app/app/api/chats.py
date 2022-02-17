@@ -174,7 +174,7 @@ async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None
             to_response = {}
             target_user = await db["chat-app"]["users"].find_one( { 'username' :  get_username['created_by'] } )
 
-            to_response["recvUsername"] = ["created_by"] # target_user 
+            to_response["recvUsername"] = get_username["created_by"] # target_user 
             to_response['recvUsername1'] = get_username['messages'][-1]['target_user'] # last message target user
             to_response["lastMessage"] = get_username["messages"][-1]["data"] # last message
             to_response["lastMessageDate"] = get_username["messages"][-1]["date_sended"]

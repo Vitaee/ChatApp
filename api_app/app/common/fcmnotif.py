@@ -26,8 +26,8 @@ def send_notification(data: list, deviceToken: str):
     
     message = messaging.Message(
         notification=messaging.Notification(
-            title=f"{data[-1]['user']}",
-            body=f"{data[-1]['data']}",
+            title=f"{data['chats'][-1]['currentUser']}",
+            body=f"{data['chats'][-1]['lastMessage']}",
         ),
         #android=messaging.AndroidConfig(
         #    ttl=datetime.timedelta(seconds=3600),
@@ -37,7 +37,7 @@ def send_notification(data: list, deviceToken: str):
         #        color='#f45342'
         #    ),
         #),
-        data= data[-1],
+        data= data['chats'][-1],
         apns=messaging.APNSConfig(
             payload=messaging.APNSPayload(
                 aps=messaging.Aps(badge=42),

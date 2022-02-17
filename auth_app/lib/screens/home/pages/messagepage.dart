@@ -74,7 +74,7 @@ class _MessagesPageState extends State<MessagesPage> {
     List<MessageData> notif_data =
         parsed.map((e) => MessageData.fromJson(e)).toList();
 
-    Navigator.of(context).push(ChatScreen.route(notif_data[-1], home_channel));
+    Navigator.of(context).push(ChatScreen.route(notif_data.last, home_channel));
   }
 
   @override
