@@ -46,6 +46,8 @@ dependencies:
   rxdart: ^0.27.3
   agora_rtc_engine: ^4.2.1
   permission_handler: ^9.0.1
+  firebase_messaging: ^11.2.6
+  firebase_core: ^1.12.0
 
 
 

@@ -3,6 +3,7 @@ from fastapi.param_functions import Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from starlette.responses import JSONResponse
 from starlette.websockets import WebSocket, WebSocketDisconnect, WebSocketState
+from common.fcmnotif import send_notification
 from core.auth_bearer import JwtBearer
 from crud.user import get_messages
 from db.mongosdb import get_database
@@ -37,7 +38,11 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     await upload_message_to_room(db,message_data)
                     # Write func. which send notify to target user
                     # await send_notify(db, message_data) 
+                    #send_notification(message_data)
                     all_messages = await get_messages(db, room_name)
+                    #all_messages['deviceToken']
+                    deviceToken = "droA182wRrivyJi3GInMFv:APA91bGKXbWWq6uQc3v1ZwpjBfFxqMHyl5IG8cW6_QD35Fu88HYfZjRdUZsXbqPoxEwD2KPtH3m8gUmw0Yvfx3FONXufDyhub-e_U5lueyTDLRxNcYM_uOO-yho2vLL6k9RwEk-9lmdB"  
+                    send_notification(all_messages, deviceToken)
                     await manager_for_room.broadcast(all_messages)
             else:
                 await manager_for_room.connect(websocket, room_name)

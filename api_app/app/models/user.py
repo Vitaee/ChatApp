@@ -12,6 +12,7 @@ class UserBase(BaseModel):
     username : str
     email : Optional[EmailStr] = None
     image :Optional[str] = ""
+    deviceToken: Optional[str] = ""
 
 class ListUser(BaseModel):
     result: List[UserBase]

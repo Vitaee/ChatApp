@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
+import 'package:auth_app/models/message_data.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -11,8 +13,8 @@ const Token =
     "006019ae3e531834992ad2a3b81629d4657IACnLTWT64J3U0q9G8W5dbFmmAj6W1HzSDWRdkcRyl1BldJjSIgAAAAAEADzxwcSRUcOYgEAAQBFRw5i";
 
 class VoiceCallUI extends StatefulWidget {
-  const VoiceCallUI({Key? key}) : super(key: key);
-
+  VoiceCallUI({Key? key, required this.messageData}) : super(key: key);
+  final MessageData messageData;
   @override
   _VoiceCallUIState createState() => _VoiceCallUIState();
 }
@@ -63,7 +65,23 @@ class _VoiceCallUIState extends State<VoiceCallUI> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Flutter example app'),
+          iconTheme: Theme.of(context).iconTheme,
+          backgroundColor: Color(0xff3a434d),
+          elevation: 0,
+          leadingWidth: 54,
+          leading: Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              child: Icon(CupertinoIcons.back, size: 28),
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ),
+          title: Row(
+            children: [
+              Text(
+                  "You are talking with: ${widget.messageData.recvUsername.toString()}")
+            ],
+          ),
         ),
         body: Stack(
           children: [

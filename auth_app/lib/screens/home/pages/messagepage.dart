@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auth_app/common/avatar.dart';
+import 'package:auth_app/common/notifications.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:auth_app/screens/home/pages/private_messageui.dart';
@@ -9,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class MessagesPage extends StatefulWidget {
   MessagesPage({Key? key}) : super(key: key);
@@ -42,13 +44,36 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
+  final FirebaseMessaging fcm = FirebaseMessaging.instance;
   WebSocketChannel? home_channel;
 
   @override
   void initState() {
     home_channel = IOWebSocketChannel.connect("ws://10.80.1.167:8080/api/chats",
         headers: {"Current-User": globals.currentUsername});
+
+    fcm.getToken().then((value) => print("\n\nToken: \n\n $value"));
+
+    //Notifications.init();
+    callNotif();
+    listenNotifications();
     super.initState();
+  }
+
+  void callNotif() async {
+    await Notifications.init(fcm);
+  }
+
+  void listenNotifications() =>
+      Notifications.onNotifications.stream.listen(onClickedNotif);
+
+  void onClickedNotif(String? payload) {
+    List parsed = json.decode(payload.toString());
+
+    List<MessageData> notif_data =
+        parsed.map((e) => MessageData.fromJson(e)).toList();
+
+    Navigator.of(context).push(ChatScreen.route(notif_data[-1], home_channel));
   }
 
   @override

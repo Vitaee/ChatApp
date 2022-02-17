@@ -8,6 +8,7 @@ import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/models/private_messages.dart';
 import 'package:auth_app/screens/home/home.dart';
 import 'package:auth_app/screens/home/pages/voicecallui.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -33,7 +34,6 @@ class ChatScreen extends StatelessWidget {
 
   final MessageData messageData;
   final WebSocketChannel home_channel;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,8 +77,12 @@ class ChatScreen extends StatelessWidget {
                   size: 26,
                 ),
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => VoiceCallUI()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => VoiceCallUI(
+                                messageData: messageData,
+                              )));
                 },
               ),
             ),
@@ -95,15 +99,14 @@ class ChatScreen extends StatelessWidget {
 }
 
 class MessageSendBar extends StatefulWidget {
-  MessageSendBar(
-      {Key? key,
-      required this.roomName,
-      required this.sourceUser,
-      required this.targetUser,
-      required this.home_channel
-      //required this.data})
-      })
-      : super(key: key);
+  MessageSendBar({
+    Key? key,
+    required this.roomName,
+    required this.sourceUser,
+    required this.targetUser,
+    required this.home_channel,
+    //required this.data})
+  }) : super(key: key);
 
   String roomName;
   String sourceUser;
@@ -114,7 +117,7 @@ class MessageSendBar extends StatefulWidget {
   late WebSocketChannel channel =
       IOWebSocketChannel.connect("ws://10.80.1.167:8080/api/chat/$roomName/",
           //"ws://192.168.254.4:8080/api/chat/$roomName/",
-          headers: {"Current-User": sourceUser});
+          headers: {"Current-User": "${sourceUser}"});
 
   @override
   _MessageSendBarState createState() => _MessageSendBarState();
@@ -132,6 +135,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
 
   @override
   void initState() {
+    //listenNotifications();
     super.initState();
 
     //_scrollController.animateTo(_scrollController.position.maxScrollExtent,
@@ -139,16 +143,11 @@ class _MessageSendBarState extends State<MessageSendBar> {
     //SchedulerBinding.instance!.addPostFrameCallback((_) {
     //  _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     // });
-
-    Notif.init();
-    listenNotifications();
   }
 
-  void listenNotifications() =>
-      Notif.onNotifications.stream.listen(onClickedNotif);
+  //void onClickedNotif(String? payload) => Navigator.of(context)
+  //    .push(MaterialPageRoute(builder: (context) => HomeScaffold()));
 
-  void onClickedNotif(String? payload) => Navigator.of(context)
-      .push(MaterialPageRoute(builder: (context) => HomeScaffold()));
   @override
   Widget build(BuildContext context) {
     return Column(

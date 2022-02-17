@@ -3,9 +3,15 @@ import 'package:auth_app/screens/auth/login/signin.dart';
 import 'package:auth_app/screens/auth/register/signup.dart';
 import 'package:auth_app/screens/home/home.dart';
 import 'package:auth_app/services/preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'firebase_options.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MyApp());
 }
 
