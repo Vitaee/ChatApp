@@ -20,11 +20,14 @@ def send_notification(data: list, deviceToken: str):
     
     #device_token = "droA182wRrivyJi3GInMFv:APA91bGKXbWWq6uQc3v1ZwpjBfFxqMHyl5IG8cW6_QD35Fu88HYfZjRdUZsXbqPoxEwD2KPtH3m8gUmw0Yvfx3FONXufDyhub-e_U5lueyTDLRxNcYM_uOO-yho2vLL6k9RwEk-9lmdB"
 
+    print()
+    print(str(data))
+    print()
     
     message = messaging.Message(
         notification=messaging.Notification(
-            title=f"{data[-1]['title']}",
-            body=f"{data[-1]['body']}",
+            title=f"{data[-1]['user']}",
+            body=f"{data[-1]['data']}",
         ),
         #android=messaging.AndroidConfig(
         #    ttl=datetime.timedelta(seconds=3600),

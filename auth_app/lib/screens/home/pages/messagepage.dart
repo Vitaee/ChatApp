@@ -68,7 +68,8 @@ class _MessagesPageState extends State<MessagesPage> {
       Notifications.onNotifications.stream.listen(onClickedNotif);
 
   void onClickedNotif(String? payload) {
-    List parsed = json.decode(payload.toString());
+    print(payload);
+    List parsed = json.decode(payload.toString())["chats"];
 
     List<MessageData> notif_data =
         parsed.map((e) => MessageData.fromJson(e)).toList();

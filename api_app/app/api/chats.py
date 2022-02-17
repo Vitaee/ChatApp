@@ -42,7 +42,8 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     all_messages = await get_messages(db, room_name)
                     #all_messages['deviceToken']
                     deviceToken = "droA182wRrivyJi3GInMFv:APA91bGKXbWWq6uQc3v1ZwpjBfFxqMHyl5IG8cW6_QD35Fu88HYfZjRdUZsXbqPoxEwD2KPtH3m8gUmw0Yvfx3FONXufDyhub-e_U5lueyTDLRxNcYM_uOO-yho2vLL6k9RwEk-9lmdB"  
-                    send_notification(all_messages, deviceToken)
+                    last_message_for_notif = await get_messages_for_notif(db, current_user)
+                    send_notification(last_message_for_notif, deviceToken)
                     await manager_for_room.broadcast(all_messages)
             else:
                 await manager_for_room.connect(websocket, room_name)
@@ -137,6 +138,51 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
                 to_response["profilePic"] = target_user["image"]
 
                 chat_response["chats"].append(to_response)
+
+            return jsonable_encoder(chat_response)
+
+    except Exception as e:
+        print(e)
+        return chat_response
+
+async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None):
+    """This function will return current user chats with other ones."""
+    chat_response = { "chats": [] }
+
+    try:
+        get_username =  await db["chat-app"]["rooms"].find_one( {'created_by':f'{current_user}'} )
+        if get_username:
+            
+            to_response = {}
+            target_user = await db["chat-app"]['users'].find_one( { 'username' :  get_username['target_user'] } )
+
+            to_response["recvUsername"] = get_username["target_user"]
+            to_response['recvUsername1'] = get_username['messages'][-1]['target_user']
+            to_response["lastMessage"] = get_username["messages"][-1]["data"]
+            to_response["lastMessageDate"] = get_username["messages"][-1]["date_sended"]
+            to_response["msg_saw_by_tusr"] = get_username["messages"][-1]["msg_saw_by_tusr"]
+            to_response["currentUser"] = current_user
+            to_response["profilePic"] = target_user["image"]
+
+            chat_response["chats"].append(to_response)
+
+            return  jsonable_encoder(chat_response)
+
+        else:
+            get_username = await db["chat-app"]["rooms"].find_one( {'target_user': f'{current_user}'} )
+            
+            to_response = {}
+            target_user = await db["chat-app"]["users"].find_one( { 'username' :  get_username['created_by'] } )
+
+            to_response["recvUsername"] = ["created_by"] # target_user 
+            to_response['recvUsername1'] = get_username['messages'][-1]['target_user'] # last message target user
+            to_response["lastMessage"] = get_username["messages"][-1]["data"] # last message
+            to_response["lastMessageDate"] = get_username["messages"][-1]["date_sended"]
+            to_response["msg_saw_by_tusr"] = get_username["messages"][-1]["msg_saw_by_tusr"]
+            to_response["currentUser"] = current_user
+            to_response["profilePic"] = target_user["image"]
+
+            chat_response["chats"].append(to_response)
 
             return jsonable_encoder(chat_response)
 
