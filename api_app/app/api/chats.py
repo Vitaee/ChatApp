@@ -36,14 +36,11 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     break
                 else:
                     await upload_message_to_room(db,message_data)
-                    # Write func. which send notify to target user
-                    # await send_notify(db, message_data) 
-                    #send_notification(message_data)
                     all_messages = await get_messages(db, room_name)
-                    #all_messages['deviceToken']
-                    last_message_for_notif = await get_messages_for_notif(db, current_user)
-                    send_notification(last_message_for_notif[0], last_message_for_notif[1])
                     await manager_for_room.broadcast(all_messages)
+                    
+                    data, deviceToken = await get_messages_for_notif(db, current_user)
+                    send_notification(data, deviceToken)
             else:
                 await manager_for_room.connect(websocket, room_name)
 
@@ -72,10 +69,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
         while True:
             if websocket.application_state == WebSocketState.CONNECTED:
                 data = await websocket.receive_text()
-                #initial_data["chats"].append(data["chats"])
                 message_data = json.loads(data)
-                # Write func. which send notify to target user
-                # await send_notify(db, message_data) 
                 latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
                 await manager_for_home.broadcast(latest_data)
             else:
