@@ -91,7 +91,9 @@ class ChatScreen extends StatelessWidget {
       ),
       body: MessageSendBar(
           roomName: "room1",
-          sourceUser: globals.currentUsername,
+          sourceUser: globals.currentUsername.toString().length > 1
+              ? globals.currentUsername
+              : messageData.recvUsername1.toString(),
           targetUser: messageData.recvUsername,
           home_channel: home_channel),
     );

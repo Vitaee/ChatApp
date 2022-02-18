@@ -41,9 +41,8 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     #send_notification(message_data)
                     all_messages = await get_messages(db, room_name)
                     #all_messages['deviceToken']
-                    deviceToken = "droA182wRrivyJi3GInMFv:APA91bGKXbWWq6uQc3v1ZwpjBfFxqMHyl5IG8cW6_QD35Fu88HYfZjRdUZsXbqPoxEwD2KPtH3m8gUmw0Yvfx3FONXufDyhub-e_U5lueyTDLRxNcYM_uOO-yho2vLL6k9RwEk-9lmdB"  
                     last_message_for_notif = await get_messages_for_notif(db, current_user)
-                    send_notification(last_message_for_notif, deviceToken)
+                    send_notification(last_message_for_notif[0], last_message_for_notif[1])
                     await manager_for_room.broadcast(all_messages)
             else:
                 await manager_for_room.connect(websocket, room_name)
@@ -155,7 +154,7 @@ async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None
             
             to_response = {}
             target_user = await db["chat-app"]['users'].find_one( { 'username' :  get_username['target_user'] } )
-
+            deviceToken = target_user['deviceToken']
             to_response["recvUsername"] = get_username["target_user"]
             to_response['recvUsername1'] = get_username['messages'][-1]['target_user']
             to_response["lastMessage"] = get_username["messages"][-1]["data"]
@@ -166,14 +165,15 @@ async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None
 
             chat_response["chats"].append(to_response)
 
-            return  jsonable_encoder(chat_response)
+            return ( jsonable_encoder(chat_response) , deviceToken )
+            #return  jsonable_encoder(chat_response)
 
         else:
             get_username = await db["chat-app"]["rooms"].find_one( {'target_user': f'{current_user}'} )
             
             to_response = {}
             target_user = await db["chat-app"]["users"].find_one( { 'username' :  get_username['created_by'] } )
-
+            deviceToken = target_user['deviceToken']
             to_response["recvUsername"] = get_username["created_by"] # target_user 
             to_response['recvUsername1'] = get_username['messages'][-1]['target_user'] # last message target user
             to_response["lastMessage"] = get_username["messages"][-1]["data"] # last message
@@ -184,7 +184,7 @@ async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None
 
             chat_response["chats"].append(to_response)
 
-            return jsonable_encoder(chat_response)
+            return ( jsonable_encoder(chat_response) , deviceToken )
 
     except Exception as e:
         print(e)
