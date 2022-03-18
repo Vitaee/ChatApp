@@ -44,7 +44,7 @@ class SearchUser extends SearchDelegate {
       dio.options = options;
 
       final res = await dio
-          .post("http://10.80.1.167:8080/api/user/filter" + "/" + "$query");
+          .post("http://10.80.2.79:8080/api/user/filter" + "/" + "$query");
 
       final List parsed = json.decode(res.data);
       List<User> list = parsed.map((e) => User.fromJson(e)).toList();

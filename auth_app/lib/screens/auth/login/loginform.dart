@@ -38,7 +38,7 @@ class LoginForm extends StatelessWidget {
                 children: [
                   WelcomeText(),
                   Divider(
-                    height: 50,
+                    height: 120,
                     thickness: 0.01,
                   ),
                   EmailInput(),
@@ -69,11 +69,11 @@ class WelcomeText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 30.0, top: 30.0),
+      padding: EdgeInsets.only(bottom: 20.0),
       child: Text(
         'Welcome!',
         textAlign: TextAlign.left,
-        style: TextStyle(color: Colors.white, fontSize: 33),
+        style: TextStyle(color: Colors.orange, fontSize: 35),
       ),
     );
   }
@@ -93,6 +93,7 @@ class EmailInput extends StatelessWidget {
             labelText: 'Email',
             labelStyle: TextStyle(color: Color(0xff0e0f0f), fontSize: 18),
             errorText: state.email.invalid ? 'invalid email' : null,
+            fillColor: Colors.black,
           ),
         );
       },
@@ -114,6 +115,7 @@ class PasswordInput extends StatelessWidget {
             labelText: 'Password',
             labelStyle: TextStyle(color: Color(0xff0e0f0f), fontSize: 18),
             errorText: state.password.invalid ? 'invalid password' : null,
+            fillColor: Colors.black,
           ),
         );
       },

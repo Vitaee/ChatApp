@@ -139,7 +139,7 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
         return chat_response
 
 async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None):
-    """This function will return current user chats with other ones."""
+    """This function will return relatioanal data for message notification."""
     chat_response = { "chats": [] }
 
     try:

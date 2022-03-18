@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auth_app/common/avatar.dart';
+import 'package:auth_app/common/myglobals.dart';
 import 'package:auth_app/common/notifications.dart';
 import 'package:auth_app/models/message_data.dart';
 import 'package:auth_app/common/myglobals.dart' as globals;
@@ -44,16 +45,15 @@ class _MessagesPageState extends State<MessagesPage> {
     }
   }
 
-  final FirebaseMessaging fcm = FirebaseMessaging.instance;
+  //final FirebaseMessaging fcm = FirebaseMessaging.instance;
   WebSocketChannel? home_channel;
 
   @override
   void initState() {
-    home_channel = IOWebSocketChannel.connect("ws://10.80.1.167:8080/api/chats",
+    home_channel = IOWebSocketChannel.connect("ws://10.80.2.79:8080/api/chats",
         headers: {"Current-User": globals.currentUsername});
 
     fcm.getToken().then((value) => print("\n\nToken: \n\n $value"));
-
     //Notifications.init();
     callNotif();
     listenNotifications();

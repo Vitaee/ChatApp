@@ -13,7 +13,7 @@ Future<List<MessageData>> getChats() async {
   dio.options = options;
 
   try {
-    final res = await dio.get("http://10.80.1.167:8080/api/user/chats/");
+    final res = await dio.get("http://10.80.2.79:8080/api/user/chats/");
     if (res.statusCode == 404) {
       return [];
     }
