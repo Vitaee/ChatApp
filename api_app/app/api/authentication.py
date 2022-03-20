@@ -57,6 +57,11 @@ async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_u
     current_user =  await get_user(db, field="username", value=current_username) 
     return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(current_user))
 
+@router.post("/user/deviceToken", dependencies=[Depends(JwtBearer())], name="Save device token of user")
+async def save_device_token(db: AsyncIOMotorClient = Depends(get_database), data = Body(...) , current_user: str = Header(None)):
+    # get user document and update device token.
+    pass
+
 @router.post("/user/filter/{query}", name="Get all users")
 async def filter_users(query: str, db:AsyncIOMotorClient=Depends(get_database), current_user: str = Header(None) ):
     finded_users = None
