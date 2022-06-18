@@ -12,3 +12,4 @@ python-multipart
 pymongo===3.12.0
 bson
 firebase-admin
+websockets

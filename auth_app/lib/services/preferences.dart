@@ -15,4 +15,5 @@ Future<String?> checkPrefs() async {
   } on Exception catch (e) {
     print(e);
   }
+  return null;
 }

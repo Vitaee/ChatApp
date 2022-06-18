@@ -44,8 +44,11 @@ class SearchUser extends SearchDelegate {
       dio.options = options;
 
       final res = await dio
-          .post("http://10.80.2.79:8080/api/user/filter" + "/" + "$query");
+          .post("http://192.168.31.175:8080/api/user/filter" + "/" + "$query");
 
+      if (res.statusCode == 404) {
+        return [];
+      }
       final List parsed = json.decode(res.data);
       List<User> list = parsed.map((e) => User.fromJson(e)).toList();
 
@@ -73,7 +76,7 @@ class SearchUser extends SearchDelegate {
                         children: [
                           Avatar.medium(
                               url: snapshot.data[index].image.replaceAll(
-                                  'localhost', 'http://10.80.1.167')),
+                                  'localhost', 'http://192.168.31.175')),
                           SizedBox(width: 20),
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,

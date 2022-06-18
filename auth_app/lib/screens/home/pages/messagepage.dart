@@ -28,7 +28,8 @@ class _MessagesPageState extends State<MessagesPage> {
     dio.options = options;
 
     try {
-      final res = await dio.get("http://10.80.1.167:8080/api/user/chats/");
+      //final res = await dio.get("http://10.80.1.167:8080/api/user/chats/");
+      final res = await dio.get("http://192.168.31.175:8080/api/user/chats/");
       if (res.statusCode == 404) {
         return [];
       }
@@ -50,7 +51,8 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   void initState() {
-    home_channel = IOWebSocketChannel.connect("ws://10.80.2.79:8080/api/chats",
+    home_channel = IOWebSocketChannel.connect(
+        "ws://192.168.31.175:8080/api/chats",
         headers: {"Current-User": globals.currentUsername});
 
     fcm.getToken().then((value) => print("\n\nToken: \n\n $value"));
@@ -82,7 +84,7 @@ class _MessagesPageState extends State<MessagesPage> {
       stream: home_channel!.stream,
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
-          if (snapshot.data.length >= 1) {
+          if (snapshot.data.toString().length > 5) {
             List parsed = json.decode(snapshot.data)["chats"];
             List<MessageData> list =
                 parsed.map((e) => MessageData.fromJson(e)).toList();
