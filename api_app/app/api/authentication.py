@@ -6,6 +6,7 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from pydantic import EmailStr
 from fastapi.encoders import jsonable_encoder
+from core.config import fastapi_url
 from core.auth_bearer import JwtBearer
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token
@@ -15,6 +16,7 @@ from models.token import TokenResponse
 router = APIRouter()
 @router.post("/user/register", response_model=UserInResponse, tags=["Authentication"], name="Registration")
 async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailStr = Body(...), password: str = Body(...), username: str = Body(...), file: UploadFile = File(...)):
+    
     await check_free_email(db, email=email)
 
     if not os.path.isdir('./static/images'):
@@ -27,7 +29,7 @@ async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailSt
     with open(f"./static/images/{name_of_file}.png", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    user = UserInCreate(password = password, username = username, email= email, image=f"localhost:8080/static/images/{name_of_file}.png")
+    user = UserInCreate(password = password, username = username, email= email, image=f"{fastapi_url}:8080/static/images/{name_of_file}.png")
 
     dbuser = await create_user(db, user)
 

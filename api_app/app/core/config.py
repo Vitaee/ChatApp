@@ -15,7 +15,7 @@ DEBUG: bool = config("DEBUG", cast=bool, default=True)
 HOST: str = config("HOST", default='0.0.0.0')
 PORT: int = config("PORT", cast=int, default=8080)
 # mongo
-MONGODB_URL: DatabaseURL = config("MONGODB_URL", cast=DatabaseURL, default='mongodb://172.17.0.2:27017')
+MONGODB_URL: DatabaseURL = config("MONGODB_URL", cast=DatabaseURL, default='mongodb+srv://cykoUser:zS73IOcwf8jjyG40@cluster0.dblj8.mongodb.net/?retryWrites=true&w=majority')#'mongodb://172.17.0.2:27017')
 MAX_CONNECTIONS_COUNT: int = config("MAX_CONNECTIONS_COUNT", cast=int, default=10)
 MIN_CONNECTIONS_COUNT: int = config("MIN_CONNECTIONS_COUNT", cast=int, default=10)
 
@@ -28,3 +28,4 @@ ALLOWED_HOSTS: List[str] = config(
 
 database_name: str = config('DATABASE_NAME', default='chat-app')
 user_collection_name = 'users'
+fastapi_url = 'localhost'
