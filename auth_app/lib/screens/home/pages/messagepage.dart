@@ -55,7 +55,8 @@ class _MessagesPageState extends State<MessagesPage> {
         "ws://192.168.31.175:8080/api/chats",
         headers: {"Current-User": globals.currentUsername});
 
-    fcm.getToken().then((value) => print("\n\nToken: \n\n $value"));
+    fcm.getToken().then(
+        (value) => postFcmToken(value)); //print("\n\nToken: \n\n $value"));
     //Notifications.init();
     callNotif();
     listenNotifications();
@@ -64,6 +65,16 @@ class _MessagesPageState extends State<MessagesPage> {
 
   void callNotif() async {
     await Notifications.init(fcm);
+  }
+
+  void postFcmToken(dynamic fcm_token) async {
+    final Dio dio = Dio();
+    BaseOptions options = BaseOptions(
+        responseType: ResponseType.plain,
+        headers: {"Current-User": globals.currentUsername});
+    dio.options = options;
+    await dio.post("http://192.168.31.175:8080/api/user/deviceToken/",
+        data: {"fcm_token": fcm_token});
   }
 
   void listenNotifications() =>

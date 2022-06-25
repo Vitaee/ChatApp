@@ -61,8 +61,9 @@ async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_u
 
 @router.post("/user/deviceToken", dependencies=[Depends(JwtBearer())], name="Save device token of user")
 async def save_device_token(db: AsyncIOMotorClient = Depends(get_database), data = Body(...) , current_user: str = Header(None)):
-    # get user document and update device token.
-    pass
+    """update user's  device token."""
+    await db["chat-app"]["users"].update_one( {"username": current_user}, {"$set": {"deviceToken":data['fcm_token']}} )
+    return JSONResponse(status_code=HTTP_200_OK, content=[{}])
 
 @router.post("/user/filter/{query}", name="Get all users")
 async def filter_users(query: str, db:AsyncIOMotorClient=Depends(get_database), current_user: str = Header(None) ):
