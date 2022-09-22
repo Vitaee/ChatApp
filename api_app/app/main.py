@@ -19,7 +19,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_HOSTS or ["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET, POST, PUT"],
     allow_headers=["*"],
 )
 
@@ -45,5 +45,5 @@ if __name__ == '__main__':
         host=HOST,
         port=PORT,
         reload=True,
-        workers=1
+        workers=2
     )

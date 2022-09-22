@@ -28,7 +28,9 @@ share/python-wheels/
 MANIFEST
 
 api_app/app/chat-env
-
+api_app/app/chatapp-env
+api_app/app/core/prod.env
+api_app/app/core/dev.env
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

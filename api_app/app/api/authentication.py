@@ -6,7 +6,7 @@ from starlette.responses import JSONResponse
 from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from pydantic import EmailStr
 from fastapi.encoders import jsonable_encoder
-from core.config import fastapi_url
+from core.config import FASTAPI_URL, PORT
 from core.auth_bearer import JwtBearer
 from db.mongosdb import AsyncIOMotorClient, get_database
 from core.jwt import create_access_token
@@ -29,7 +29,7 @@ async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailSt
     with open(f"./static/images/{name_of_file}.png", "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    user = UserInCreate(password = password, username = username, email= email, image=f"{fastapi_url}:8080/static/images/{name_of_file}.png")
+    user = UserInCreate(password = password, username = username, email= email, image=f"{FASTAPI_URL}:{PORT}/static/images/{name_of_file}.png")
 
     dbuser = await create_user(db, user)
 
