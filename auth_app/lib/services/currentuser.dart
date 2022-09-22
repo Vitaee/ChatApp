@@ -11,7 +11,7 @@ Future<User?> currentUser() async {
     dio.options.headers["Authorization"] = "Bearer ${jwt}";
 
     //Response response = await dio.get("http://10.80.2.79:8080/api/user/");
-    Response response = await dio.get("http://192.168.31.175:8080/api/user/");
+    Response response = await dio.get("http://185.250.192.69:8080/api/user/");
     User data = User.fromJson(response.data);
 
     return data;

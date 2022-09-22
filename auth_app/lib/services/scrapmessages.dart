@@ -6,14 +6,14 @@ import 'package:dio/dio.dart';
 Future<List<DirectMessages>?> getMessages(String roomName) async {
   final Dio dio = Dio();
   BaseOptions options = BaseOptions(
-      baseUrl: "http://10.80.2.79:8080/api/messages/$roomName/",
+      baseUrl: "http://185.250.192.69:8080/api/messages/$roomName/",
       responseType: ResponseType.plain);
   dio.options = options;
 
   try {
     final res =
         //    await dio.get("http://192.168.254.4:8080/api/messages/$roomName/");
-        await dio.get("http://10.80.2.79:8080/api/messages/$roomName/");
+        await dio.get("http://185.250.192.69:8080/api/messages/$roomName/");
 
     final List parsed = json.decode(res.data);
 

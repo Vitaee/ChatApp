@@ -29,7 +29,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
     try {
       //final res = await dio.get("http://10.80.1.167:8080/api/user/chats/");
-      final res = await dio.get("http://192.168.31.175:8080/api/user/chats/");
+      final res = await dio.get("http://185.250.192.69:8080/api/user/chats/");
       if (res.statusCode == 404) {
         return [];
       }
@@ -73,7 +73,7 @@ class _MessagesPageState extends State<MessagesPage> {
         responseType: ResponseType.plain,
         headers: {"Current-User": globals.currentUsername});
     dio.options = options;
-    await dio.post("http://192.168.31.175:8080/api/user/deviceToken/",
+    await dio.post("http://185.250.192.69:8080/api/user/deviceToken/",
         data: {"fcm_token": fcm_token});
   }
 
