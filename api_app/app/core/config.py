@@ -10,13 +10,12 @@ JWT_TOKEN_PREFIX = "Bearer"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 VERSION = "0.1.0"
 
-config = Config("local.env")
-print(config("DEBUG"))
+config = Config("prod.env")
 
 DEBUG: bool = config("DEBUG", cast=bool, default=True)
 HOST: str = config("HOST", default='0.0.0.0')
 PORT: int = config("PORT", cast=int, default=8080)
-print(HOST)
+
 # mongo
 MONGODB_URL: DatabaseURL = config("MONGODB_URL", cast=str, default='mongodb://172.17.0.4:27017')
 MAX_CONNECTIONS_COUNT: int = config("MAX_CONNECTIONS_COUNT", cast=int, default=10)
