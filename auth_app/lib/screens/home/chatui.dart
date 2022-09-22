@@ -1,8 +1,11 @@
 import 'package:auth_app/screens/home/pages/messagepage.dart';
+import 'package:auth_app/screens/search/searchEmpty.dart';
 import 'package:auth_app/screens/search/searchui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../profile/userprofile.dart';
 
 class ChatScreen extends StatelessWidget {
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
@@ -10,8 +13,8 @@ class ChatScreen extends StatelessWidget {
 
   final pages = [
     MessagesPage(),
-    //SearchPage(),
-    //ProfilePage(),
+    SearchUserPage(),
+    ProfilePage(),
   ];
 
   final pageTitles = const ['Messages', 'Search', 'Profile'];

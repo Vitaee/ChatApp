@@ -51,23 +51,27 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   void initState() {
-    home_channel = IOWebSocketChannel.connect(
-        "ws://192.168.31.175:8080/api/chats",
-        headers: {"Current-User": globals.currentUsername});
+    asyncMethods();
 
-    fcm.getToken().then(
-        (value) => postFcmToken(value)); //print("\n\nToken: \n\n $value"));
-    //Notifications.init();
-    callNotif();
     listenNotifications();
     super.initState();
   }
 
-  void callNotif() async {
+  void asyncMethods() async {
+    home_channel = IOWebSocketChannel.connect(
+        "ws://185.250.192.69:8080/api/chats",
+        headers: {"Current-User": globals.currentUsername});
+
+    dynamic deviceTokenOfUser = await fcm.getToken();
+    await postFcmToken(deviceTokenOfUser);
+    await callNotif();
+  }
+
+  Future callNotif() async {
     await Notifications.init(fcm);
   }
 
-  void postFcmToken(dynamic fcm_token) async {
+  Future postFcmToken(dynamic fcm_token) async {
     final Dio dio = Dio();
     BaseOptions options = BaseOptions(
         responseType: ResponseType.plain,
@@ -200,7 +204,9 @@ class _MessageTilesState extends State<MessageTiles> {
                               Padding(
                                 padding: EdgeInsets.all(10.0),
                                 child: Avatar.medium(
-                                  url: snapshot.data[index].profilePic,
+                                  url: snapshot.data[index].profilePic
+                                      .toString()
+                                      .replaceAll('185', 'http://185'),
                                 ),
                               ),
                               Expanded(

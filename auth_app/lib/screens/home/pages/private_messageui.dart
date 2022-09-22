@@ -117,7 +117,7 @@ class MessageSendBar extends StatefulWidget {
   //List<dynamic>? data;
 
   late WebSocketChannel channel =
-      IOWebSocketChannel.connect("ws://10.80.2.79:8080/api/chat/$roomName/",
+      IOWebSocketChannel.connect("ws://185.250.192.69:8080/api/chat/$roomName/",
           //"ws://192.168.254.4:8080/api/chat/$roomName/",
           headers: {"Current-User": "${sourceUser}"});
 
@@ -178,12 +178,12 @@ class _MessageSendBarState extends State<MessageSendBar> {
                           return _MessageOwnTile(
                               message: list[index].data.toString(),
                               messageDate:
-                                  list[index].date_sended.split(" ")[1]);
+                                  list[index].date_sended); //.split(" ")[1]);
                         } else {
                           return _MessageTile(
                               message: list[index].data.toString(),
                               messageDate:
-                                  list[index].date_sended.split(" ")[1]);
+                                  list[index].date_sended); //.split(" ")[1]);
                         }
                       } else {
                         return Center(
@@ -449,7 +449,7 @@ class _AppBarTitle extends StatelessWidget {
     return Row(
       children: [
         Avatar.small(
-          url: messageData.profilePic,
+          url: messageData.profilePic!.replaceAll('185', 'http://185'),
         ),
         const SizedBox(
           width: 16,

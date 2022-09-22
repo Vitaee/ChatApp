@@ -44,7 +44,7 @@ class SearchUser extends SearchDelegate {
       dio.options = options;
 
       final res = await dio
-          .post("http://192.168.31.175:8080/api/user/filter" + "/" + "$query");
+          .post("http://185.250.192.69:8080/api/user/filter" + "/" + "$query");
 
       if (res.statusCode == 404) {
         return [];
@@ -58,6 +58,8 @@ class SearchUser extends SearchDelegate {
       return [];
     }
   }
+
+  WebSocketChannel type = WebSocketChannel as WebSocketChannel;
 
   @override
   Widget buildResults(BuildContext context) {
@@ -75,8 +77,9 @@ class SearchUser extends SearchDelegate {
                       title: Row(
                         children: [
                           Avatar.medium(
-                              url: snapshot.data[index].image.replaceAll(
-                                  'localhost', 'http://192.168.31.175')),
+                              url: snapshot.data[index].image
+                                  .toString()
+                                  .replaceAll('185', 'http://185')),
                           SizedBox(width: 20),
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +108,9 @@ class SearchUser extends SearchDelegate {
                       MessageData msg = MessageData(
                           currentUser: globals.currentUsername,
                           lastMessage: "",
-                          profilePic: snapshot.data[index].image,
+                          profilePic: snapshot.data[index].image
+                              .toString()
+                              .replaceAll('185', 'http://185'),
                           lastMessageDate: "",
                           recvUsername: snapshot.data[index].username,
                           sawbyUser: "false");
