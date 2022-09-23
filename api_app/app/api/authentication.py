@@ -14,7 +14,7 @@ from crud.user import create_user, check_free_email, get_filtered_users, get_mes
 from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse, ListUser
 from models.token import TokenResponse
 router = APIRouter()
-@router.post("/user/register", response_model=UserInResponse, tags=["Authentication"], name="Registration")
+@router.post("/user/register/", response_model=UserInResponse, tags=["Authentication"], name="Registration")
 async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailStr = Body(...), password: str = Body(...), username: str = Body(...), file: UploadFile = File(...)):
     
     await check_free_email(db, email=email)
@@ -38,7 +38,7 @@ async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailSt
     return JSONResponse(status_code = HTTP_200_OK, content = jsonable_encoder({"token":token}) )
 
 
-@router.post("/user/login", response_model=TokenResponse, tags=["Authentication"], name="Email / username login")
+@router.post("/user/login/", response_model=TokenResponse, tags=["Authentication"], name="Email / username login")
 async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depends(get_database) ):
     print(data)
     if '@' in data.username:
@@ -59,7 +59,7 @@ async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_u
     current_user =  await get_user(db, field="username", value=current_username) 
     return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(current_user))
 
-@router.post("/user/deviceToken", dependencies=[Depends(JwtBearer())], name="Save device token of user")
+@router.post("/user/deviceToken/", dependencies=[Depends(JwtBearer())], name="Save device token of user")
 async def save_device_token(db: AsyncIOMotorClient = Depends(get_database), data = Body(...) , current_user: str = Header(None)):
     """update user's  device token."""
     await db["chat-app"]["users"].update_one( {"username": current_user}, {"$set": {"deviceToken":data['fcm_token']}} )

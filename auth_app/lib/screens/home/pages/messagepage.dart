@@ -59,7 +59,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   void asyncMethods() async {
     home_channel = IOWebSocketChannel.connect(
-        "ws://185.250.192.69:8080/api/chats",
+        "ws://185.250.192.69:8080/api/chats/",
         headers: {"Current-User": globals.currentUsername});
 
     dynamic deviceTokenOfUser = await fcm.getToken();
