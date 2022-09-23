@@ -56,12 +56,11 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
     """
     This function will listen users and check if they send message other users.
     """
-    print()
-    print("\t", current_user, " <-- connected home page")
-    print()
+    print("\n\t", current_user, " <-- connected home page", "\n")
     try:
         await manager_for_home.connect(websocket, current_user)
         initial_data = await get_messages_of_user(db, current_user)
+        print("\n", initial_data, "\n")
        
         await manager_for_home.broadcast(initial_data) # should response with user chats
         
