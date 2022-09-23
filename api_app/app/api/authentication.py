@@ -54,7 +54,7 @@ async def login(data: UserInRequest = Body(...), db: AsyncIOMotorClient = Depend
     token = create_access_token(data = {"username" : dbuser.username})
     return JSONResponse(status_code=HTTP_200_OK, content= jsonable_encoder( { "token":token} ))
 
-@router.get("/user", response_model=UserBase, tags=["Authentication"], dependencies=[Depends(JwtBearer())], name="Get current user")
+@router.get("/user/", response_model=UserBase, tags=["Authentication"], dependencies=[Depends(JwtBearer())], name="Get current user")
 async def retrieve_user(db: AsyncIOMotorClient = Depends(get_database),current_username: User = Depends(JwtBearer())):
     current_user =  await get_user(db, field="username", value=current_username) 
     return JSONResponse(status_code=HTTP_200_OK, content=jsonable_encoder(current_user))
