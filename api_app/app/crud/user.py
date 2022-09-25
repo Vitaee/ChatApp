@@ -18,7 +18,8 @@ async def get_user( conn: AsyncIOMotorClient, field: str, value: str) -> Union[U
     return False
 
 async def get_filtered_users(conn: AsyncIOMotorClient, query: str):
-    users =  await conn[DB_NAME][USER_COLLECTION_NAME].aggregate( [{'$match':{'username':{ "$regex":f'{query}'}}}] ).to_list(length=50)
+    # users =  await conn[DB_NAME][USER_COLLECTION_NAME].aggregate( [{'$match':{'username':{ "$regex":f'{query}'}}}] ).to_list(length=50)
+    users =  await conn[DB_NAME][USER_COLLECTION_NAME].find( {"username": { "$ne": f'{query}' }}).to_list(length=100)
     if users:
         return { "result": users }
     else:

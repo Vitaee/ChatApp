@@ -14,12 +14,12 @@ def send_notification(datas: list, deviceToken: str):
 
         ``datas = { "title": "sender_username", "body":"hello!", "sender_image":"localhost/images/profileurl", ... }``.
 
-    Finally, will return response.
+    Finally, will return response. 
     """
     
     
     try:
-        firebase_cred = credentials.Certificate("/home/vitae/Desktop/Sprojects/OtherProjects/ChatApp/api_app/app/common/pushnotif-78183-firebase-adminsdk-dwgqs-50f4ba7d6f.json")
+        firebase_cred = credentials.Certificate("./pushnotif-78183-firebase-adminsdk-dwgqs-50f4ba7d6f.json")
         firebase_app = firebase_admin.initialize_app(firebase_cred)
     except:   pass
 

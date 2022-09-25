@@ -19,21 +19,18 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class ChatScreen extends StatelessWidget {
-  static Route route(MessageData data, home_channel) => MaterialPageRoute(
+  static Route route(MessageData data) => MaterialPageRoute(
         builder: (context) => ChatScreen(
           messageData: data,
-          home_channel: home_channel,
         ),
       );
 
   ChatScreen({
     Key? key,
     required this.messageData,
-    required this.home_channel,
   }) : super(key: key);
 
   final MessageData messageData;
-  final WebSocketChannel home_channel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,12 +87,12 @@ class ChatScreen extends StatelessWidget {
         ],
       ),
       body: MessageSendBar(
-          roomName: "room1",
-          sourceUser: globals.currentUsername.toString().length > 1
-              ? globals.currentUsername
-              : messageData.recvUsername1.toString(),
-          targetUser: messageData.recvUsername,
-          home_channel: home_channel),
+        roomName: "room1",
+        sourceUser: globals.currentUsername.toString().length > 1
+            ? globals.currentUsername
+            : messageData.recvUsername1.toString(),
+        targetUser: messageData.recvUsername,
+      ),
     );
   }
 }
@@ -106,20 +103,12 @@ class MessageSendBar extends StatefulWidget {
     required this.roomName,
     required this.sourceUser,
     required this.targetUser,
-    required this.home_channel,
     //required this.data})
   }) : super(key: key);
 
   String roomName;
   String sourceUser;
   String? targetUser;
-  late WebSocketChannel home_channel;
-  //List<dynamic>? data;
-
-  late WebSocketChannel channel =
-      IOWebSocketChannel.connect("ws://185.250.192.69:8080/api/chat/$roomName/",
-          //"ws://192.168.254.4:8080/api/chat/$roomName/",
-          headers: {"Current-User": "${sourceUser}"});
 
   @override
   _MessageSendBarState createState() => _MessageSendBarState();
@@ -127,7 +116,7 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
-  final ScrollController _scrollController =
+  late ScrollController _scrollController =
       ScrollController(initialScrollOffset: 0);
 
   // write func to update saw messages by target user.
@@ -139,6 +128,10 @@ class _MessageSendBarState extends State<MessageSendBar> {
   void initState() {
     //listenNotifications();
     super.initState();
+
+    globals.room_channel = IOWebSocketChannel.connect(
+        "ws://185.250.192.69:8080/api/chat/${widget.roomName}/",
+        headers: {"Current-User": "${widget.sourceUser}"});
 
     //_scrollController.animateTo(_scrollController.position.maxScrollExtent,
     //   duration: Duration(milliseconds: 100), curve: Curves.easeOut);
@@ -159,7 +152,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
             padding: EdgeInsets.symmetric(horizontal: 8.0),
             // _DateLable(lable: "Yestarday"),
             child: StreamBuilder(
-              stream: widget.channel.stream,
+              stream: globals.room_channel.stream,
               builder: (context, dynamic snapshot) {
                 if (snapshot.connectionState != ConnectionState.waiting) {
                   List parsed = json.decode(snapshot.data);
@@ -258,7 +251,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
 
   void sendData() {
     if (text_controller.text.isNotEmpty) {
-      widget.channel.sink.add(
+      globals.room_channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}" }]');
 
       /*Notif.showNotif(
@@ -267,7 +260,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
           payload: 'dynamic payload');*/
       // send new message for notification
       //globals.listen_message.sink.add(
-      widget.home_channel.sink.add(
+      globals.home_channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');
 
       text_controller.clear();
@@ -281,7 +274,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
   @override
   void dispose() {
     super.dispose();
-    widget.channel.sink.close();
+    globals.room_channel.sink.close();
   }
 }
 

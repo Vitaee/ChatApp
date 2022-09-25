@@ -90,7 +90,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
           .add(MapEntry("file", await MultipartFile.fromFile(image.path)));
 
       Response response = await dio.post(
-          "http://185.250.192.69:8080/api/user/register",
+          "http://185.250.192.69:8080/api/user/register/",
           data: form_data);
 
       Token data = Token.fromJson(response.data);

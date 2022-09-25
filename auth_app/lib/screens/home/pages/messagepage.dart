@@ -9,6 +9,7 @@ import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:auth_app/services/scrapchats.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -20,34 +21,8 @@ class MessagesPage extends StatefulWidget {
 }
 
 class _MessagesPageState extends State<MessagesPage> {
-  Future<List<MessageData>> getChats() async {
-    final Dio dio = Dio();
-    BaseOptions options = BaseOptions(
-        responseType: ResponseType.plain,
-        headers: {"Current-User": globals.currentUsername});
-    dio.options = options;
-
-    try {
-      //final res = await dio.get("http://10.80.1.167:8080/api/user/chats/");
-      final res = await dio.get("http://185.250.192.69:8080/api/user/chats/");
-      if (res.statusCode == 404) {
-        return [];
-      }
-
-      final List parsed = json.decode(res.data)["chats"];
-
-      List<MessageData> list =
-          parsed.map((e) => MessageData.fromJson(e)).toList();
-
-      return list;
-    } on Exception catch (e) {
-      //print(e);
-      return [];
-    }
-  }
-
   //final FirebaseMessaging fcm = FirebaseMessaging.instance;
-  WebSocketChannel? home_channel;
+  //late WebSocketChannel home_channel;
 
   @override
   void initState() {
@@ -58,9 +33,11 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   void asyncMethods() async {
-    home_channel = IOWebSocketChannel.connect(
-        "ws://185.250.192.69:8080/api/chats/",
-        headers: {"Current-User": globals.currentUsername});
+    setState(() {
+      globals.home_channel = IOWebSocketChannel.connect(
+          "ws://185.250.192.69:8080/api/chats",
+          headers: {"Current-User": globals.currentUsername.trim()});
+    });
 
     dynamic deviceTokenOfUser = await fcm.getToken();
     await postFcmToken(deviceTokenOfUser);
@@ -73,9 +50,16 @@ class _MessagesPageState extends State<MessagesPage> {
 
   Future postFcmToken(dynamic fcm_token) async {
     final Dio dio = Dio();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String? jwt = prefs.getString("jwt");
+
     BaseOptions options = BaseOptions(
         responseType: ResponseType.plain,
-        headers: {"Current-User": globals.currentUsername});
+        headers: {
+          "Current-User": globals.currentUsername,
+          'Authorization': "Bearer ${jwt}"
+        });
     dio.options = options;
     await dio.post("http://185.250.192.69:8080/api/user/deviceToken/",
         data: {"fcm_token": fcm_token});
@@ -90,16 +74,16 @@ class _MessagesPageState extends State<MessagesPage> {
     List<MessageData> notif_data =
         parsed.map((e) => MessageData.fromJson(e)).toList();
 
-    Navigator.of(context).push(ChatScreen.route(notif_data.last, home_channel));
+    Navigator.of(context).push(ChatScreen.route(notif_data.last));
   }
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: home_channel!.stream,
-      builder: (context, AsyncSnapshot snapshot) {
+      stream: globals.home_channel.stream,
+      builder: (context, AsyncSnapshot<dynamic> snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
-          if (snapshot.data.toString().length > 5) {
+          if (snapshot.data.toString().length > 4) {
             List parsed = json.decode(snapshot.data)["chats"];
             List<MessageData> list =
                 parsed.map((e) => MessageData.fromJson(e)).toList();
@@ -107,31 +91,23 @@ class _MessagesPageState extends State<MessagesPage> {
             return Stack(
               children: [
                 Align(
-                  child: CustomScrollView(
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: _Stories(),
-                      ),
-                    ],
-                  ),
+                  child: Text("Hello ${globals.currentUsername}"),
                   alignment: Alignment.topCenter,
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 145.0),
-                  child: MessageTiles(home_channel: home_channel!),
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: MessageTiles(),
                 )
               ],
             );
           } else {
             return CustomScrollView(
               slivers: [
-                SliverToBoxAdapter(
-                  child: _Stories(),
-                ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return Center(
-                      child: Text("Text with someone!"),
+                      child:
+                          Text("Text with someone!" + snapshot.data.toString()),
                     );
                   }, childCount: 1),
                 ),
@@ -150,14 +126,13 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   void dispose() {
     super.dispose();
-    home_channel!.sink.close();
+    globals.home_channel.sink.close();
     //widget.home_channel.sink.close();
   }
 }
 
 class MessageTiles extends StatefulWidget {
-  const MessageTiles({Key? key, required this.home_channel}) : super(key: key);
-  final WebSocketChannel home_channel;
+  const MessageTiles({Key? key}) : super(key: key);
   @override
   _MessageTilesState createState() => _MessageTilesState();
 }
@@ -183,8 +158,8 @@ class _MessageTilesState extends State<MessageTiles> {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return InkWell(
                       onTap: () => {
-                        Navigator.of(context).push(ChatScreen.route(
-                            snapshot.data[index], widget.home_channel))
+                        Navigator.of(context)
+                            .push(ChatScreen.route(snapshot.data[index]))
                       },
                       child: Container(
                         height: 100,
@@ -307,90 +282,6 @@ class _MessageTilesState extends State<MessageTiles> {
         fontWeight: FontWeight.w600,
         color: Colors.white,
       ),
-    );
-  }
-}
-
-class _Stories extends StatelessWidget {
-  const _Stories({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Card(
-        color: Colors.transparent,
-        elevation: 0,
-        child: SizedBox(
-          height: 140,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 16.0, top: 8, bottom: 16),
-                child: Text(
-                  'Stories',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 15,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: 60,
-                        child: _StoryCard(
-                          profilePic:
-                              "https://t4.ftcdn.net/jpg/00/84/67/19/360_F_84671939_jxymoYZO8Oeacc3JRBDE8bSXBWj0ZfA9.jpg",
-                          userName: "can",
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StoryCard extends StatelessWidget {
-  const _StoryCard({Key? key, required this.profilePic, required this.userName})
-      : super(key: key);
-
-  final String profilePic;
-  final String userName;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Avatar.medium(url: profilePic),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: Text(
-              "Username",
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                  fontSize: 11,
-                  letterSpacing: 0.3,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

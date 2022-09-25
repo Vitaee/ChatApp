@@ -114,8 +114,7 @@ class SearchUser extends SearchDelegate {
                           lastMessageDate: "",
                           recvUsername: snapshot.data[index].username,
                           sawbyUser: "false");
-                      Navigator.of(context)
-                          .push(ChatScreen.route(msg, WebSocketChannel));
+                      Navigator.of(context).push(ChatScreen.route(msg));
                     },
                   );
                 },

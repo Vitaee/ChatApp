@@ -13,7 +13,10 @@ from core.jwt import create_access_token
 from crud.user import create_user, check_free_email, get_filtered_users, get_messages, get_user
 from models.user import User, UserBase, UserInCreate, UserInRequest, UserInResponse, ListUser
 from models.token import TokenResponse
+from fastapi_pagination import Page, add_pagination, paginate, Params
+
 router = APIRouter()
+
 @router.post("/user/register/", response_model=UserInResponse, tags=["Authentication"], name="Registration")
 async def register(db:AsyncIOMotorClient = Depends(get_database), email: EmailStr = Body(...), password: str = Body(...), username: str = Body(...), file: UploadFile = File(...)):
     
@@ -65,16 +68,16 @@ async def save_device_token(db: AsyncIOMotorClient = Depends(get_database), data
     await db["chat-app"]["users"].update_one( {"username": current_user}, {"$set": {"deviceToken":data['fcm_token']}} )
     return JSONResponse(status_code=HTTP_200_OK, content=[{}])
 
-@router.post("/user/filter/{query}", name="Get all users")
-async def filter_users(query: str, db:AsyncIOMotorClient=Depends(get_database), current_user: str = Header(None) ):
+@router.post("/user/filter/", name="Get all users",  response_model=Page[ListUser])
+async def filter_users(db:AsyncIOMotorClient=Depends(get_database), current_user: str = Header(None)):
     finded_users = None
-
+    
     if current_user:
-        finded_users = await get_filtered_users(db, query )
+        finded_users = await get_filtered_users(db, current_user )
 
     if finded_users:
         res = ListUser(**finded_users)
-        return JSONResponse(status_code = HTTP_200_OK, content = res.dict()["result"] )
+        return JSONResponse(status_code = HTTP_200_OK, content = jsonable_encoder(res)['result']) 
     else:
         return JSONResponse(status_code = HTTP_404_NOT_FOUND, content={"error":"User not found!"})
 

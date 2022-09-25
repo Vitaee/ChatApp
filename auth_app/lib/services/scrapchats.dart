@@ -13,8 +13,9 @@ Future<List<MessageData>> getChats() async {
   dio.options = options;
 
   try {
-    final res = await dio.get("http://185.250.192.69:8080/api/user/chats/");
+    final res = await dio.get("http://185.250.192.69:8080/api/user/chats");
     if (res.statusCode == 404) {
+      print(res.statusCode);
       return [];
     }
 
@@ -25,7 +26,7 @@ Future<List<MessageData>> getChats() async {
 
     return list;
   } on Exception catch (e) {
-    //print(e);
+    print(e);
     return [];
   }
 }

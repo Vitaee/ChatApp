@@ -19,4 +19,14 @@ def test_url(url):
     
     return asyncio.get_event_loop().run_until_complete(inner())
 
-test_url("ws://127.0.0.1:8080/api/chat/room1/can")
+#test_url("ws://127.0.0.1:8080/api/chat/room1/can")
+
+
+async def hello():
+    uri = "ws://185.250.192.69:8080/api/chats"
+    async with websockets.connect(uri, extra_headers={"Current-User": "vitae"}) as websocket:
+        res = await websocket.recv()
+        print("\n\n", res, "\n\n")
+
+
+asyncio.run(hello())

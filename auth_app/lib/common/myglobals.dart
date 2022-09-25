@@ -1,6 +1,9 @@
 library globals;
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 String currentUsername = "";
-final FirebaseMessaging fcm = FirebaseMessaging.instance;
+FirebaseMessaging fcm = FirebaseMessaging.instance;
+late WebSocketChannel home_channel;
+late WebSocketChannel room_channel;

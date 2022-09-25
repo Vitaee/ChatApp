@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.14.0 <3.0.0"
+  sdk: ">=2.14.0 <= 3.3.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -41,12 +41,12 @@ dependencies:
   image_picker: ^0.8.5+3
   shared_preferences: ^2.0.9
   cached_network_image: ^3.2.0
-  web_socket_channel: ^2.1.0
-  flutter_local_notifications: ^9.2.0
+  web_socket_channel: ^2.2.0
+  flutter_local_notifications: ^11.0.0
   rxdart: ^0.27.3
   agora_rtc_engine: ^5.2.0
   permission_handler: ^10.0.0
-  firebase_messaging: ^11.2.6
+  firebase_messaging: ^13.0.3
   firebase_core: ^1.12.0
 
 
@@ -60,7 +60,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  # flutter_lints: ^2.0.1
+  flutter_lints: ^2.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

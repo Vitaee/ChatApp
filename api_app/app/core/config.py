@@ -17,7 +17,7 @@ HOST: str = config("HOST", default='0.0.0.0')
 PORT: int = config("PORT", cast=int, default=8080)
 
 # mongo
-MONGODB_URL: DatabaseURL = config("MONGODB_URL", cast=str, default='mongodb://172.17.0.4:27017')
+MONGODB_URL: DatabaseURL = config("MONGODB_URL", cast=DatabaseURL, default='mongodb://185.250.192.69:27017')
 MAX_CONNECTIONS_COUNT: int = config("MAX_CONNECTIONS_COUNT", cast=int, default=10)
 MIN_CONNECTIONS_COUNT: int = config("MIN_CONNECTIONS_COUNT", cast=int, default=10)
 

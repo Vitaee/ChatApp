@@ -11,8 +11,7 @@ from core.errors import http_error_handler, http422_error_handler
 from db.mongodb_utils import connect_to_mongodb, close_mongo_connection
 from core.config import ALLOWED_HOSTS, API_PREFIX, DEBUG, PROJECT_NAME, VERSION, HOST, PORT
 from api import router as api_router
-
-
+from fastapi_pagination import Page, add_pagination
 
 app = FastAPI(title=PROJECT_NAME, debug=DEBUG, version=VERSION)
 app.add_middleware(
@@ -37,7 +36,7 @@ app.add_exception_handler(RequestValidationError, http422_error_handler)
 app.include_router(api_router, prefix=API_PREFIX)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
+add_pagination(app)
 
 if __name__ == '__main__':
     uvicorn.run(

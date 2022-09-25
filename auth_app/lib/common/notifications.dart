@@ -4,14 +4,15 @@ import 'package:rxdart/rxdart.dart';
 
 class Notif {
   static final _notifs = FlutterLocalNotificationsPlugin();
-  static final onNotifications = BehaviorSubject<String?>();
+  static final onNotifications = BehaviorSubject<NotificationResponse?>();
 
   static Future init({bool initScheduled = false}) async {
     final android = AndroidInitializationSettings('@mipmap/ic_launcher');
-    final iOS = IOSInitializationSettings();
+    final iOS = DarwinInitializationSettings();
     final settings = InitializationSettings(android: android, iOS: iOS);
 
-    await _notifs.initialize(settings, onSelectNotification: (payload) async {
+    await _notifs.initialize(settings,
+        onDidReceiveNotificationResponse: (NotificationResponse payload) async {
       onNotifications.add(payload);
     });
   }
@@ -20,7 +21,7 @@ class Notif {
     return NotificationDetails(
       android: AndroidNotificationDetails('channel name', 'channel description',
           importance: Importance.max),
-      iOS: IOSNotificationDetails(),
+      iOS: DarwinNotificationDetails(categoryIdentifier: 'plainCategory'),
     );
   }
 
@@ -42,13 +43,13 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 
 class Notifications {
   static final _notifs = FlutterLocalNotificationsPlugin();
-  static final onNotifications = BehaviorSubject<String?>();
+  static final onNotifications = BehaviorSubject<NotificationResponse?>();
 
   static Future notificationDetails() async {
     return NotificationDetails(
       android: AndroidNotificationDetails('channel name', 'channel description',
           icon: '@mipmap/ic_launcher', importance: Importance.max),
-      iOS: IOSNotificationDetails(),
+      iOS: DarwinNotificationDetails(categoryIdentifier: 'plainCategory'),
     );
   }
 
@@ -64,14 +65,15 @@ class Notifications {
   static Future init(FirebaseMessaging fcm) async {
     //FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
     final android = AndroidInitializationSettings('@mipmap/ic_launcher');
-    final iOS = IOSInitializationSettings();
+    final iOS = DarwinInitializationSettings();
     final settings = InitializationSettings(android: android, iOS: iOS);
     await _notifs
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    await _notifs.initialize(settings, onSelectNotification: (payload) async {
+    await _notifs.initialize(settings,
+        onDidReceiveNotificationResponse: (NotificationResponse payload) async {
       onNotifications.add(payload);
     });
 
