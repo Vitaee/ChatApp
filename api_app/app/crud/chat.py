@@ -24,6 +24,7 @@ class SocketManager:
         await websocket.send_text(message)
 
     async def broadcast(self, data):
+        print("\n [LOG] from broadcast function in SocketManager: \t", data, "\n")
         for connection in self.active_connections:
             await connection[0].send_json(data)    
 

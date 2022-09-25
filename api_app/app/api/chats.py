@@ -56,12 +56,11 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
     """
     This function will listen users and check if they send message other users.
     """
-    print()
-    print("\t", current_user, " <-- connected home page")
-    print()
+    print("\n\t", current_user, " <-- connected home page", "\n")
     try:
         await manager_for_home.connect(websocket, current_user)
         initial_data = await get_messages_of_user(db, current_user)
+        print("\n", initial_data, "\n")
        
         await manager_for_home.broadcast(initial_data) # should response with user chats
         
@@ -99,6 +98,7 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
 
     try:
         get_username =  await db["chat-app"]["rooms"].aggregate( [{'$match':{'created_by':{ "$regex":f'{current_user}'}}}] ).to_list(length=None)
+        print("\n [LOG] from get_messages_of_user: \t", get_username, "\n")
         if get_username:
             for i in get_username:
                 to_response = {}
@@ -113,7 +113,7 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
                 to_response["profilePic"] = target_user["image"]
 
                 chat_response["chats"].append(to_response)
-
+            print("\n [LOG] from get_messages_of_user after first for loop: \t", get_username, "\n")
             return  jsonable_encoder(chat_response)
 
         else:
@@ -135,7 +135,8 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
             return jsonable_encoder(chat_response)
 
     except Exception as e:
-        print(e)
+        print("\n [ERR] from get_messages_of_user in exception: \t" ,e, "\n")
+        print("\n [LOG] from get_messages_of_user in exception responsed data: \t", chat_response, "\n")
         return chat_response
 
 async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None):
