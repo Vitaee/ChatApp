@@ -30,17 +30,13 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
             if websocket.application_state == WebSocketState.CONNECTED:
                 data = await websocket.receive_text()
                 message_data = json.loads(data)
-               
-                if "type" in message_data and message_data["type"] == "dismissal":
-                    await manager_for_room.disconnect(websocket, room_name)
-                    break
-                else:
-                    await upload_message_to_room(db,message_data)
-                    all_messages = await get_messages(db, room_name)
-                    await manager_for_room.broadcast(all_messages)
-                    
-                    data, deviceToken = await get_messages_for_notif(db, current_user)
-                    send_notification(data, deviceToken)
+                
+                await upload_message_to_room(db,message_data)
+                all_messages = await get_messages(db, room_name)
+                await manager_for_room.broadcast(all_messages)
+                
+                data, deviceToken = await get_messages_for_notif(db, current_user)
+                send_notification(data, deviceToken)
             else:
                 await manager_for_room.connect(websocket, room_name)
 

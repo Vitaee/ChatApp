@@ -76,6 +76,7 @@ async def get_room(db: AsyncIOMotorClient, room_name : str = None):
 
 async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
     message_data = data[0]
+    print("[LOG] uploading message ", message_data)
     try:
         room = await get_room(db, message_data['room_name'])
         user = await get_user(db, field="username", value = message_data['user'])
@@ -85,6 +86,7 @@ async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
         message_data.pop('room_name', None)
         await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$push": {"messages":message_data}} )
         if not room["target_user"]:
+            print("[LOG] not target user running another db query.")
             await db["chat-app"]["rooms"].update_one( {"_id": room["_id"]}, {"$set": {"target_user":message_data["target_user"]}} )
         return True
 
