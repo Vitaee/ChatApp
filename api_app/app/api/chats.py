@@ -105,12 +105,14 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
                 target_user = await db["chat-app"]['users'].find_one( { 'username' :  i['target_user'] } )
         
                 to_response["recvUsername"] = i["target_user"]
-                to_response['recvUsername1'] = i['messages'][-1]['target_user']
-                to_response["lastMessage"] = i["messages"][-1]["data"]
-                to_response["lastMessageDate"] = i["messages"][-1]["date_sended"]
-                to_response["msg_saw_by_tusr"] = i["messages"][-1]["msg_saw_by_tusr"]
                 to_response["currentUser"] = current_user
                 to_response["profilePic"] = target_user["image"]
+                
+                if len(i['messages']) >= 1:
+                    to_response['recvUsername1'] = i['messages'][-1]['target_user']
+                    to_response["lastMessage"] = i["messages"][-1]["data"]
+                    to_response["lastMessageDate"] = i["messages"][-1]["date_sended"]
+                    to_response["msg_saw_by_tusr"] = i["messages"][-1]["msg_saw_by_tusr"]
 
                 chat_response["chats"].append(to_response)
             print("\n [LOG] from get_messages_of_user after first for loop: \t", get_username, "\n")
@@ -123,12 +125,14 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
                 target_user = await db["chat-app"]["users"].find_one( { 'username' :  i['created_by'] } )
 
                 to_response["recvUsername"] = i["created_by"] # target_user 
-                to_response['recvUsername1'] = i['messages'][-1]['target_user'] # last message target user
-                to_response["lastMessage"] = i["messages"][-1]["data"] # last message
-                to_response["lastMessageDate"] = i["messages"][-1]["date_sended"]
-                to_response["msg_saw_by_tusr"] = i["messages"][-1]["msg_saw_by_tusr"]
                 to_response["currentUser"] = current_user
                 to_response["profilePic"] = target_user["image"]
+                if len(i['messages']) >= 1:
+                    to_response['recvUsername1'] = i['messages'][-1]['target_user'] # last message target user
+                    to_response["lastMessage"] = i["messages"][-1]["data"] # last message
+                    to_response["lastMessageDate"] = i["messages"][-1]["date_sended"]
+                    to_response["msg_saw_by_tusr"] = i["messages"][-1]["msg_saw_by_tusr"]
+          
 
                 chat_response["chats"].append(to_response)
 
