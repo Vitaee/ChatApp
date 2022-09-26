@@ -32,4 +32,4 @@ ALLOWED_METHODS: List[str] = config('ALLOWED_METHODS', cast=CommaSeparatedString
 
 DB_NAME: str = config('DATABASE_NAME', default='chat-app')
 USER_COLLECTION_NAME: str = 'users'
-FASTAPI_URL: str = config('FASTAPI_URL', default='localhost')
+FASTAPI_URL: str = config('HOST', default='localhost')
