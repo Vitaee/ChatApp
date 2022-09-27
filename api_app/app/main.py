@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
-import uvicorn, hypercorn
+import uvicorn, asyncio, hypercorn
+from hypercorn.asyncio import serve
+from hypercorn.config import Config
 from fastapi_contrib.tracing.utils import setup_opentracing
 from fastapi_contrib.tracing.middlewares import OpentracingMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -39,6 +41,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 add_pagination(app)
 
 if __name__ == '__main__':
+    config = Config()
+    config.bind= ["localhost:8080"]
+    asyncio.run(serve(app, config))
+    """
     hypercorn.run(
         "main:app",
         host=HOST,
@@ -46,3 +52,4 @@ if __name__ == '__main__':
         reload=True,
         workers=2
     )
+    """
