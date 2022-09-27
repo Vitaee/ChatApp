@@ -43,7 +43,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     await manager_for_room.connect(websocket, room_name)
             except Exception as e: 
                 print("[ERR] chat/room/ websocket.application_state error occured.")
-                pass
+                break
 
     except Exception as e:
         print("\n")
@@ -77,8 +77,8 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                 else:
                     await manager_for_home.connect(websocket, current_user)
             except Exception as e:
-                print("[ERR] chats/ websocket.application_state error occured.")
-                pass
+                print("[ERR] chats/ websocket.application_state error occured." , "\n\n" ,e , "\n\n")
+                break
 
     except Exception as e:
         print("\n")

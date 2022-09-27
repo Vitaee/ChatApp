@@ -30,7 +30,7 @@ async def hello():
         print("\n\n", res, "\n\n")
 
 
-#asyncio.run(hello())
+asyncio.run(hello())
 
 
 async def connect_ws():
@@ -43,4 +43,4 @@ async def connect_ws():
                         Decode_data = json.loads(webSoc_Received)      
                         print(Decode_data)
 
-asyncio.run(connect_ws())
+#asyncio.run(connect_ws())
