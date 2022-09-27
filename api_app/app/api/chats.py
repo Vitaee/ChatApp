@@ -27,18 +27,23 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
 
         # wait for messages
         while True:
-            if websocket.application_state == WebSocketState.CONNECTED:
-                data = await websocket.receive_text()
-                message_data = json.loads(data)
-                
-                await upload_message_to_room(db,message_data)
-                all_messages = await get_messages(db, room_name)
-                await manager_for_room.broadcast(all_messages)
-                
-                data, deviceToken = await get_messages_for_notif(db, current_user)
-                send_notification(data, deviceToken)
-            else:
-                await manager_for_room.connect(websocket, room_name)
+
+            try:
+                if websocket.application_state == WebSocketState.CONNECTED:
+                    data = await websocket.receive_text()
+                    message_data = json.loads(data)
+                    
+                    await upload_message_to_room(db,message_data)
+                    all_messages = await get_messages(db, room_name)
+                    await manager_for_room.broadcast(all_messages)
+                    
+                    data, deviceToken = await get_messages_for_notif(db, current_user)
+                    send_notification(data, deviceToken)
+                else:
+                    await manager_for_room.connect(websocket, room_name)
+            except Exception as e: 
+                print("[ERR] chat/room/ websocket.application_state error occured.")
+                pass
 
     except Exception as e:
         print("\n")
@@ -62,13 +67,18 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
         
         # wait for messages
         while True:
-            if websocket.application_state == WebSocketState.CONNECTED:
-                data = await websocket.receive_text()
-                message_data = json.loads(data)
-                latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
-                await manager_for_home.broadcast(latest_data)
-            else:
-                await manager_for_home.connect(websocket, current_user)
+            try:
+
+                if websocket.application_state == WebSocketState.CONNECTED:
+                    data = await websocket.receive_text()
+                    message_data = json.loads(data)
+                    latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
+                    await manager_for_home.broadcast(latest_data)
+                else:
+                    await manager_for_home.connect(websocket, current_user)
+            except Exception as e:
+                print("[ERR] chats/ websocket.application_state error occured.")
+                pass
 
     except Exception as e:
         print("\n")
