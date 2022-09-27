@@ -42,7 +42,7 @@ add_pagination(app)
 
 if __name__ == '__main__':
     config = Config()
-    config.bind= ["localhost:8080"]
+    config.bind= [HOST]
     asyncio.run(serve(app, config))
     """
     hypercorn.run(
