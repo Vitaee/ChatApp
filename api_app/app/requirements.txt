@@ -16,3 +16,4 @@ PyJWT
 bcrypt
 gunicorn
 fastapi-pagination[all]
+hypercorn

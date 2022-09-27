@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
-import uvicorn
+import uvicorn, hypercorn
 from fastapi_contrib.tracing.utils import setup_opentracing
 from fastapi_contrib.tracing.middlewares import OpentracingMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -39,7 +39,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 add_pagination(app)
 
 if __name__ == '__main__':
-    uvicorn.run(
+    hypercorn.run(
         "main:app",
         host=HOST,
         port=PORT,
