@@ -5,7 +5,6 @@ from starlette.middleware.cors import CORSMiddleware
 import uvicorn, asyncio, hypercorn
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
-from fastapi_contrib.tracing.utils import setup_opentracing
 from fastapi_contrib.tracing.middlewares import OpentracingMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -20,17 +19,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_HOSTS or ["*"],
     allow_credentials=True,
-    allow_methods=["GET, POST, PUT"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.add_event_handler("startup", connect_to_mongodb)
 app.add_event_handler("shutdown", close_mongo_connection)
-# set opentracing
-@app.on_event('startup')
-async def startup():
-    setup_opentracing(app)
-    app.add_middleware(OpentracingMiddleware)
 
 app.add_exception_handler(HTTPException, http_error_handler)
 app.add_exception_handler(RequestValidationError, http422_error_handler)
@@ -45,7 +39,7 @@ if __name__ == '__main__':
     config.bind= [f"{HOST}:8080"]
     asyncio.run(serve(app, config))
     """
-    hypercorn.run(
+    uvicorn.run(
         "main:app",
         host=HOST,
         port=PORT,

@@ -24,23 +24,26 @@ def test_url(url):
 
 
 async def hello():
-    uri = "ws://185.250.192.69:8080/api/chats"
+    uri = "ws://0.0.0.0:8080/api/chats"
     async with websockets.connect(uri, extra_headers={"Current-User": "vitaa"}) as websocket:
         res = await websocket.recv()
         print("\n\n", res, "\n\n")
 
 
-asyncio.run(hello())
+#asyncio.run(hello())
 
 
 async def connect_ws():
         print("websockets.client module defines a simple WebSocket client API::::::")    
-        async with websockets.connect("ws://185.250.192.69:8080/api/chats",extra_headers={"Current-User": "vitaa"}) as websocket:
+        async with websockets.connect("ws://0.0.0.0:8080/api/chats",extra_headers={"Current-User": "vitaa"}) as websocket:
                 while True:
-                        print ("starting")
+                        print ("Connect:")
                         webSoc_Received = await websocket.recv()
-                        print ("Ending")
+                        print ("Receive Initial Data:")
                         Decode_data = json.loads(webSoc_Received)      
                         print(Decode_data)
+                        print("Disconnect:")
+                        await websocket.close(1000)
+                        break
 
-#asyncio.run(connect_ws())
+asyncio.run(connect_ws())

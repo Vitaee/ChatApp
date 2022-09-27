@@ -18,8 +18,10 @@ class SocketManager:
         self.active_connections.append((websocket,room))
 
     def disconnect(self, websocket: WebSocket, room:str):
-        self.active_connections.remove((websocket, room))
-
+        try:
+            self.active_connections.remove((websocket, room))
+        except: 
+            pass
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
 

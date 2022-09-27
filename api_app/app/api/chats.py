@@ -40,17 +40,19 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     data, deviceToken = await get_messages_for_notif(db, current_user)
                     send_notification(data, deviceToken)
                 else:
-                    await manager_for_room.connect(websocket, room_name)
+                    break
+                    #await manager_for_room.connect(websocket, room_name)
             except Exception as e: 
                 print("[ERR] chat/room/ websocket.application_state error occured.")
                 break
 
     except Exception as e:
+        #await manager_for_room.disconnect(websocket, room_name)
         print("\n")
         print("\tcould not connect --> ", e)
         print(type(e).__name__, e.args, e.__repr__)
         print("\n")
-        manager_for_room.disconnect(websocket, room_name)
+        
 
 @router.websocket("/chats")
 async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, current_user: str = Header(None)):
@@ -75,17 +77,20 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                     latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
                     await manager_for_home.broadcast(latest_data)
                 else:
-                    await manager_for_home.connect(websocket, current_user)
+                    break
+                    #await manager_for_home.connect(websocket, current_user)
             except Exception as e:
                 print("[ERR] chats/ websocket.application_state error occured." , "\n\n" ,e , "\n\n")
+                print(type(e).__name__, e.args, e.__repr__)
+                #await manager_for_home.disconnect(websocket, current_user)
                 break
 
     except Exception as e:
+        #await manager_for_home.disconnect(websocket,current_user)
         print("\n")
         print("\tcould not connect --> ", e)
         print(type(e).__name__, e.args, e.__repr__)
         print("\n")
-        manager_for_home.disconnect(websocket,current_user)
 
 
 @router.get("/user/chats/")
