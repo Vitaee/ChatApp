@@ -32,11 +32,11 @@ class _MessagesPageState extends State<MessagesPage> {
         "ws://185.250.192.69:8080/api/chats/${globals.currentUsername}/",
         headers: {"Current-User": globals.currentUsername});
 
-    super.initState();
-
     asyncMethods();
 
     listenNotifications();
+
+    super.initState();
   }
 
   void asyncMethods() async {
@@ -73,10 +73,11 @@ class _MessagesPageState extends State<MessagesPage> {
     print(notif!.payload);
     print("^^^^^^^^^^^^^^");
     String parsed = notif.payload!.toString();
-    List json_data = json.decode(parsed)["chats"];
 
-    List<MessageData> notif_data =
-        json_data.map((e) => MessageData.fromJson(e)).toList();
+    List<MessageData> notif_data = json
+        .decode(parsed)["chats"]
+        .map((e) => MessageData.fromJson(e))
+        .toList();
 
     Navigator.of(context).push(ChatScreen.route(notif_data.last));
   }
@@ -88,6 +89,9 @@ class _MessagesPageState extends State<MessagesPage> {
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
           if (snapshot.data.toString().length > 5) {
+            print(snapshot.data);
+            print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+
             List parsed = snapshot.data != null
                 ? json.decode(snapshot.data)["chats"]
                 : [];

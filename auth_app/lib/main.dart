@@ -26,10 +26,10 @@ class MyApp extends StatelessWidget {
             title: "Chat App",
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
-                scaffoldBackgroundColor: Color.fromARGB(255, 22, 25, 29),
+                scaffoldBackgroundColor: Color.fromARGB(255, 52, 55, 59),
                 //colorScheme: ColorScheme.dark(),
                 appBarTheme: AppBarTheme(
-                    backgroundColor: Color.fromARGB(255, 17, 20, 24))),
+                    backgroundColor: Color.fromARGB(255, 68, 73, 80))),
             darkTheme: ThemeData.dark(),
             routes: {
               '/': (context) => LoginScaffold(),

@@ -74,7 +74,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                     latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
                     await manager_for_home.broadcast(latest_data)
                 else:
-                    await manager_for_home.connect(websocket, current_user)
+                    await manager_for_home.connect(websocket, client_name)
             except WebSocketDisconnect:
                 print("[ERR] chats/ WebSocketDisconnect.")
                 manager_for_home.disconnect(websocket, client_name)

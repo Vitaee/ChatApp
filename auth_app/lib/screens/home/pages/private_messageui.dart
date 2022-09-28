@@ -127,13 +127,15 @@ class _MessageSendBarState extends State<MessageSendBar> {
   @override
   void initState() {
     //listenNotifications();
-    super.initState();
 
     globals.room_channel = IOWebSocketChannel.connect(
         "ws://185.250.192.69:8080/api/chat/${widget.roomName}/",
         headers: {"Current-User": "${widget.sourceUser}"});
 
     globals.targetUser = widget.targetUser;
+
+    super.initState();
+
     /*_scrollController.animateTo(_scrollController.position.maxScrollExtent,
         duration: Duration(milliseconds: 100), curve: Curves.easeOut);
     SchedulerBinding.instance!.addPostFrameCallback((_) {
@@ -156,17 +158,25 @@ class _MessageSendBarState extends State<MessageSendBar> {
               stream: globals.room_channel.stream,
               builder: (context, dynamic snapshot) {
                 if (snapshot.connectionState != ConnectionState.waiting) {
-                  List parsed =
-                      snapshot.data != null ? json.decode(snapshot.data) : [];
+                  List<DirectMessages> list = [];
+                  try {
+                    List parsed =
+                        snapshot.data != null ? json.decode(snapshot.data) : [];
 
-                  List<DirectMessages> list =
-                      parsed.map((e) => DirectMessages.fromJson(e)).toList();
+                    list =
+                        parsed.map((e) => DirectMessages.fromJson(e)).toList();
+                  } catch (err) {
+                    print(err);
+                    print("^^^^^^^^^^^^^^");
+                  }
                   //if (list.length >= 1) {
                   //  scrollIt();
                   //}
 
                   return ListView.builder(
                     //controller: _scrollController,
+                    //reverse: true,
+                    physics: BouncingScrollPhysics(),
                     itemBuilder: (context, index) {
                       if (list[index].data != null) {
                         if (list[index].user == widget.sourceUser) {
@@ -224,7 +234,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
                   padding: EdgeInsets.only(left: 16.0),
                   child: TextField(
                     controller: text_controller,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                     decoration: InputDecoration(
                       hintText: 'Type something...',
                       border: InputBorder.none,
@@ -251,7 +261,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
     );
   }
 
-  void sendData() {
+  void sendData() async {
     if (text_controller.text.isNotEmpty) {
       globals.room_channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}" }]');
@@ -262,14 +272,21 @@ class _MessageSendBarState extends State<MessageSendBar> {
           payload: 'dynamic payload');*/
       // send new message for notification
       //globals.listen_message.sink.add(
-      //globals.home_channel.sink.add('[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');
+      /*globals.home_channel.sink.add(
+          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');*/
 
+      await refreshTargetUserPage();
       text_controller.clear();
       /*_scrollController.animateTo(
           _scrollController.position.maxScrollExtent + 85,
           duration: Duration(milliseconds: 300),
           curve: Curves.easeOut);*/
     }
+  }
+
+  Future<void> refreshTargetUserPage() async {
+    IOWebSocketChannel.connect(
+        "ws://185.250.192.69:8080/api/chats/${widget.targetUser}/");
   }
 
   @override
@@ -443,7 +460,9 @@ class _AppBarTitle extends StatelessWidget {
     return Row(
       children: [
         Avatar.small(
-          url: messageData.profilePic!,
+          url: messageData.profilePic!
+              .toString()
+              .replaceAll('185', 'http://185'),
         ),
         const SizedBox(
           width: 16,

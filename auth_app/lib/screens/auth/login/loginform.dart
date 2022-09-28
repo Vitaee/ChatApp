@@ -92,10 +92,11 @@ class EmailInput extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle:
-                TextStyle(color: Color.fromARGB(255, 3, 36, 36), fontSize: 18),
+                TextStyle(color: Color.fromARGB(255, 13, 17, 17), fontSize: 18),
             errorText: state.email.invalid ? 'invalid email' : null,
-            fillColor: Colors.blue,
+            fillColor: Color.fromARGB(255, 0, 60, 109),
           ),
+          style: TextStyle(color: Colors.black),
         );
       },
     );
@@ -115,10 +116,11 @@ class PasswordInput extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Password',
             labelStyle:
-                TextStyle(color: Color.fromARGB(255, 3, 36, 36), fontSize: 18),
+                TextStyle(color: Color.fromARGB(255, 12, 17, 17), fontSize: 18),
             errorText: state.password.invalid ? 'invalid password' : null,
             fillColor: Colors.blue,
           ),
+          style: TextStyle(color: Colors.black),
         );
       },
     );

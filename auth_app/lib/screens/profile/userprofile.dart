@@ -8,7 +8,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.blueGrey[800],
+        backgroundColor: Color.fromARGB(255, 52, 55, 59),
         body: SafeArea(
           minimum: const EdgeInsets.only(top: 100),
           child: FutureBuilder(
