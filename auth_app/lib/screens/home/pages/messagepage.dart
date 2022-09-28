@@ -9,8 +9,10 @@ import 'package:auth_app/screens/home/pages/private_messageui.dart';
 import 'package:auth_app/services/scrapchats.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -26,19 +28,18 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   void initState() {
+    globals.home_channel = IOWebSocketChannel.connect(
+        "ws://185.250.192.69:8080/api/chats/${globals.currentUsername}/",
+        headers: {"Current-User": globals.currentUsername});
+
+    super.initState();
+
     asyncMethods();
 
     listenNotifications();
-    super.initState();
   }
 
   void asyncMethods() async {
-    setState(() {
-      globals.home_channel = IOWebSocketChannel.connect(
-          "ws://185.250.192.69:8080/api/chats",
-          headers: {"Current-User": globals.currentUsername.trim()});
-    });
-
     dynamic deviceTokenOfUser = await fcm.getToken();
     await postFcmToken(deviceTokenOfUser);
     await callNotif();
@@ -68,11 +69,14 @@ class _MessagesPageState extends State<MessagesPage> {
   void listenNotifications() =>
       Notifications.onNotifications.stream.listen(onClickedNotif);
 
-  void onClickedNotif(dynamic payload) {
-    List parsed = payload["chats"];
+  void onClickedNotif(NotificationResponse? notif) {
+    print(notif!.payload);
+    print("^^^^^^^^^^^^^^");
+    String parsed = notif.payload!.toString();
+    List json_data = json.decode(parsed)["chats"];
 
     List<MessageData> notif_data =
-        parsed.map((e) => MessageData.fromJson(e)).toList();
+        json_data.map((e) => MessageData.fromJson(e)).toList();
 
     Navigator.of(context).push(ChatScreen.route(notif_data.last));
   }
@@ -81,10 +85,12 @@ class _MessagesPageState extends State<MessagesPage> {
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: globals.home_channel.stream,
-      builder: (context, AsyncSnapshot<dynamic> snapshot) {
+      builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
-          if (snapshot.data.toString().length > 4) {
-            List parsed = json.decode(snapshot.data)["chats"];
+          if (snapshot.data.toString().length > 5) {
+            List parsed = snapshot.data != null
+                ? json.decode(snapshot.data)["chats"]
+                : [];
             List<MessageData> list =
                 parsed.map((e) => MessageData.fromJson(e)).toList();
 
@@ -106,8 +112,8 @@ class _MessagesPageState extends State<MessagesPage> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return Center(
-                      child:
-                          Text("Text with someone!" + snapshot.data.toString()),
+                      child: Text(
+                          "Text with someone! ${globals.currentUsername} ${snapshot.data}"),
                     );
                   }, childCount: 1),
                 ),
@@ -126,7 +132,8 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   void dispose() {
     super.dispose();
-    globals.home_channel.sink.close();
+    globals.home_channel.sink.close(status.goingAway);
+    //globals.home_channel.sink.close();
     //widget.home_channel.sink.close();
   }
 }

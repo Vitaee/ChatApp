@@ -7,3 +7,4 @@ String currentUsername = "";
 FirebaseMessaging fcm = FirebaseMessaging.instance;
 late WebSocketChannel home_channel;
 late WebSocketChannel room_channel;
+late String? targetUser;

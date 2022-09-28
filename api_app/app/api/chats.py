@@ -51,14 +51,14 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         manager_for_room.disconnect(websocket, room_name)
         
 
-@router.websocket("/chats")
-async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, current_user: str = Header(None)):
+@router.websocket("/chats/{client_name}/")
+async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, client_name:str=None, current_user: str = Header(None)):
     """
     This function will listen users and check if they send message other users.
     """
-    print("\n\t", current_user, " <-- connected home page", "\n")
+    print("\n\t", client_name, " <-- connected home page", "\n")
     try:
-        await manager_for_home.connect(websocket, current_user)
+        await manager_for_home.connect(websocket, client_name)
         initial_data = await get_messages_of_user(db, current_user)
         print("\n", initial_data, "\n")
        
@@ -77,7 +77,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                     await manager_for_home.connect(websocket, current_user)
             except WebSocketDisconnect:
                 print("[ERR] chats/ WebSocketDisconnect.")
-                manager_for_home.disconnect(websocket, current_user)
+                manager_for_home.disconnect(websocket, client_name)
                 await manager_for_home.broadcast({ "err": "client disconnected!"})
                 break
 

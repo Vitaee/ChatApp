@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/status.dart' as status;
 import 'package:auth_app/common/myglobals.dart' as globals;
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -116,8 +117,7 @@ class MessageSendBar extends StatefulWidget {
 
 class _MessageSendBarState extends State<MessageSendBar> {
   TextEditingController text_controller = TextEditingController();
-  late ScrollController _scrollController =
-      ScrollController(initialScrollOffset: 0);
+  //ScrollController _scrollController = ScrollController(initialScrollOffset: 0);
 
   // write func to update saw messages by target user.
   /*Future updateSeenMessage() async {
@@ -133,11 +133,12 @@ class _MessageSendBarState extends State<MessageSendBar> {
         "ws://185.250.192.69:8080/api/chat/${widget.roomName}/",
         headers: {"Current-User": "${widget.sourceUser}"});
 
-    //_scrollController.animateTo(_scrollController.position.maxScrollExtent,
-    //   duration: Duration(milliseconds: 100), curve: Curves.easeOut);
-    //SchedulerBinding.instance!.addPostFrameCallback((_) {
-    //  _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-    // });
+    globals.targetUser = widget.targetUser;
+    /*_scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 100), curve: Curves.easeOut);
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });*/
   }
 
   //void onClickedNotif(String? payload) => Navigator.of(context)
@@ -155,7 +156,8 @@ class _MessageSendBarState extends State<MessageSendBar> {
               stream: globals.room_channel.stream,
               builder: (context, dynamic snapshot) {
                 if (snapshot.connectionState != ConnectionState.waiting) {
-                  List parsed = json.decode(snapshot.data);
+                  List parsed =
+                      snapshot.data != null ? json.decode(snapshot.data) : [];
 
                   List<DirectMessages> list =
                       parsed.map((e) => DirectMessages.fromJson(e)).toList();
@@ -164,7 +166,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
                   //}
 
                   return ListView.builder(
-                    controller: _scrollController,
+                    //controller: _scrollController,
                     itemBuilder: (context, index) {
                       if (list[index].data != null) {
                         if (list[index].user == widget.sourceUser) {
@@ -260,21 +262,20 @@ class _MessageSendBarState extends State<MessageSendBar> {
           payload: 'dynamic payload');*/
       // send new message for notification
       //globals.listen_message.sink.add(
-      globals.home_channel.sink.add(
-          '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');
+      //globals.home_channel.sink.add('[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');
 
       text_controller.clear();
-      _scrollController.animateTo(
+      /*_scrollController.animateTo(
           _scrollController.position.maxScrollExtent + 85,
           duration: Duration(milliseconds: 300),
-          curve: Curves.easeOut);
+          curve: Curves.easeOut);*/
     }
   }
 
   @override
   void dispose() {
     super.dispose();
-    globals.room_channel.sink.close();
+    globals.room_channel.sink.close(status.goingAway);
   }
 }
 
@@ -430,7 +431,7 @@ class _DateLable extends StatelessWidget {
 }
 
 class _AppBarTitle extends StatelessWidget {
-  const _AppBarTitle({
+  _AppBarTitle({
     Key? key,
     required this.messageData,
   }) : super(key: key);
@@ -442,7 +443,7 @@ class _AppBarTitle extends StatelessWidget {
     return Row(
       children: [
         Avatar.small(
-          url: messageData.profilePic!.replaceAll('185', 'http://185'),
+          url: messageData.profilePic!,
         ),
         const SizedBox(
           width: 16,
