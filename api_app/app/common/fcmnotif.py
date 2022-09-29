@@ -1,6 +1,7 @@
 from email.policy import default
 from firebase_admin import messaging, credentials, delete_app, get_app
 import datetime, firebase_admin
+from core.config import NOTIF_JSON_PATH
 
 
 
@@ -19,7 +20,7 @@ def send_notification(datas: list, deviceToken: str):
     
     
     try:
-        firebase_cred = credentials.Certificate("./pushnotif-78183-firebase-adminsdk-dwgqs-50f4ba7d6f.json")
+        firebase_cred = credentials.Certificate(f"{NOTIF_JSON_PATH}")
         firebase_app = firebase_admin.initialize_app(firebase_cred)
     except:   pass
 

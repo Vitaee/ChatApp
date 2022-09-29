@@ -129,7 +129,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
     //listenNotifications();
 
     globals.room_channel = IOWebSocketChannel.connect(
-        "ws://185.250.192.69:8080/api/chat/${widget.roomName}/",
+        "ws://10.80.2.154:8080/api/chat/${widget.roomName}/",
         headers: {"Current-User": "${widget.sourceUser}"});
 
     globals.targetUser = widget.targetUser;
@@ -275,7 +275,7 @@ class _MessageSendBarState extends State<MessageSendBar> {
       /*globals.home_channel.sink.add(
           '[{ "type":"entrance", "data":"${text_controller.text}", "room_name":"${widget.roomName}", "user":"${widget.sourceUser}", "target_user":"${widget.targetUser}", "msg_saw_by_tusr":"false", "date_sended":"${DateTime.now()}"   }]');*/
 
-      await refreshTargetUserPage();
+      //await refreshTargetUserPage();
       text_controller.clear();
       /*_scrollController.animateTo(
           _scrollController.position.maxScrollExtent + 85,
@@ -284,10 +284,10 @@ class _MessageSendBarState extends State<MessageSendBar> {
     }
   }
 
-  Future<void> refreshTargetUserPage() async {
+  /*Future<void> refreshTargetUserPage() async {
     IOWebSocketChannel.connect(
-        "ws://185.250.192.69:8080/api/chats/${widget.targetUser}/");
-  }
+        "ws://10.80.2.154:8080/api/chats/${widget.targetUser}/");
+  }*/
 
   @override
   void dispose() {

@@ -75,14 +75,16 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                     await manager_for_home.broadcast(latest_data)
                 else:
                     await manager_for_home.connect(websocket, client_name)
-            except WebSocketDisconnect:
+            except WebSocketDisconnect as e:
                 print("[ERR] chats/ WebSocketDisconnect.")
+                print("\n\n\n", e, "\n\n\n")
                 manager_for_home.disconnect(websocket, client_name)
                 await manager_for_home.broadcast({ "err": "client disconnected!"})
                 break
 
-    except WebSocketDisconnect:
+    except WebSocketDisconnect as e:
         manager_for_home.disconnect(websocket,current_user)
+        print("\n\n\n", e, "\n\n\n")
         await manager_for_home.broadcast({ "err": "client disconnected!"})
 
 @router.get("/user/chats/")

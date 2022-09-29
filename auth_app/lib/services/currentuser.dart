@@ -1,6 +1,7 @@
 import 'package:auth_app/models/user.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:auth_app/common/myglobals.dart' as globals;
 
 Future<User?> currentUser() async {
   final Dio dio = Dio();
@@ -10,8 +11,7 @@ Future<User?> currentUser() async {
 
     dio.options.headers["Authorization"] = "Bearer ${jwt}";
 
-    //Response response = await dio.get("http://10.80.2.79:8080/api/user/");
-    Response response = await dio.get("http://185.250.192.69:8080/api/user/");
+    Response response = await dio.get("http://${globals.prodUrl}/api/user/");
     User data = User.fromJson(response.data);
 
     return data;

@@ -29,7 +29,7 @@ class _MessagesPageState extends State<MessagesPage> {
   @override
   void initState() {
     globals.home_channel = IOWebSocketChannel.connect(
-        "ws://185.250.192.69:8080/api/chats/${globals.currentUsername}/",
+        "ws://${globals.prodUrl}/api/chats/${globals.currentUsername}/",
         headers: {"Current-User": globals.currentUsername});
 
     asyncMethods();
@@ -54,7 +54,7 @@ class _MessagesPageState extends State<MessagesPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String? jwt = prefs.getString("jwt");
-
+    dynamic res;
     BaseOptions options = BaseOptions(
         responseType: ResponseType.plain,
         headers: {
@@ -62,8 +62,12 @@ class _MessagesPageState extends State<MessagesPage> {
           'Authorization': "Bearer ${jwt}"
         });
     dio.options = options;
-    await dio.post("http://185.250.192.69:8080/api/user/deviceToken/",
-        data: {"fcm_token": fcm_token});
+    try {
+      res = await dio.post("http://${globals.prodUrl}/api/user/deviceToken/",
+          data: {"fcm_token": fcm_token});
+    } catch (err) {
+      print(err);
+    }
   }
 
   void listenNotifications() =>
@@ -92,12 +96,17 @@ class _MessagesPageState extends State<MessagesPage> {
             print(snapshot.data);
             print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 
-            List parsed = snapshot.data != null
-                ? json.decode(snapshot.data)["chats"]
-                : [];
-            List<MessageData> list =
-                parsed.map((e) => MessageData.fromJson(e)).toList();
-
+            try {
+              List parsed = snapshot.data != null
+                  ? json.decode(snapshot.data)["chats"]
+                  : [];
+              List<MessageData> list =
+                  parsed.map((e) => MessageData.fromJson(e)).toList();
+            } catch (err) {
+              globals.home_channel = IOWebSocketChannel.connect(
+                  "ws://${globals.prodUrl}/api/chats/${globals.currentUsername}/",
+                  headers: {"Current-User": globals.currentUsername});
+            }
             return Stack(
               children: [
                 Align(

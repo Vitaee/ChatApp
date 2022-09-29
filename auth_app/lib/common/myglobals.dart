@@ -8,3 +8,5 @@ FirebaseMessaging fcm = FirebaseMessaging.instance;
 late WebSocketChannel home_channel;
 late WebSocketChannel room_channel;
 late String? targetUser;
+String prodUrl = "185.250.192.69:8080";
+String localUrl = "10.80.2.154:8080";

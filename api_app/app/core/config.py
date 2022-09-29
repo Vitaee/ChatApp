@@ -33,3 +33,6 @@ ALLOWED_METHODS: List[str] = config('ALLOWED_METHODS', cast=CommaSeparatedString
 DB_NAME: str = config('DATABASE_NAME', default='chat-app')
 USER_COLLECTION_NAME: str = 'users'
 FASTAPI_URL: str = config('HOST', default='localhost')
+
+NOTIF_JSON_PATH: str = config('NOTIF_JSON_PATH', cast=str, default='E:\\MainProjects\\ChatApp\\api_app\\app\\common\\pushnotif-78183-firebase-adminsdk-dwgqs-50f4ba7d6f.json')
+

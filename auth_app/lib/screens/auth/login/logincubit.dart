@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'loginstate.dart';
+import 'package:auth_app/common/myglobals.dart' as globals;
 
 class LoginCubit extends Cubit<LoginState> {
   LoginCubit() : super(LoginState(errorMessage: ''));
@@ -33,10 +34,9 @@ class LoginCubit extends Cubit<LoginState> {
     try {
       //await Future.delayed(const Duration(milliseconds: 500));
 
-      Response response =
-          await dio.post("http://185.250.192.69:8080/api/user/login/",
-              //"http://192.168.254.4:8080/api/user/login",
-              data: {"username": email, "password": password});
+      Response response = await dio.post(
+          "http://${globals.prodUrl}/api/user/login/",
+          data: {"username": email, "password": password});
 
       Token data = Token.fromJson(response.data);
 

@@ -1,3 +1,4 @@
+from distutils.log import debug
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
@@ -38,12 +39,13 @@ if __name__ == '__main__':
     config = Config()
     config.bind= [f"{HOST}:8080"]
     asyncio.run(serve(app, config))
+    
     """
     uvicorn.run(
         "main:app",
-        host=HOST,
-        port=PORT,
+        host="0.0.0.0",  
+        port=8080,
         reload=True,
-        workers=2
+        debug=True,
     )
     """
