@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 api_app/app/__pycache__
 api_app/app/static/
+api_app/app/prod.env
 # C extensions
 *.so
 
