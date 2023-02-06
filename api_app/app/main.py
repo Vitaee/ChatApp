@@ -32,7 +32,7 @@ app.add_exception_handler(RequestValidationError, http422_error_handler)
 
 app.include_router(api_router, prefix=API_PREFIX)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+#app.mount("/static", StaticFiles(directory="static"), name="static")
 add_pagination(app)
 
 if __name__ == '__main__':

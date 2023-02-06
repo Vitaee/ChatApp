@@ -35,7 +35,7 @@ async def hello():
 
 async def connect_ws():
         print("websockets.client module defines a simple WebSocket client API::::::")    
-        async with websockets.connect("ws://0.0.0.0:8080/api/chats",extra_headers={"Current-User": "vitaa"}) as websocket:
+        async with websockets.connect("ws://185.250.192.69:8080/api/chats",extra_headers={"Current-User": "sysenix"}) as websocket:
                 while True:
                         print ("Connect:")
                         webSoc_Received = await websocket.recv()

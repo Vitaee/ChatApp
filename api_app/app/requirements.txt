@@ -1,5 +1,5 @@
 fastapi
-starlette===0.20.4
+starlette
 pydantic
 passlib
 databases
@@ -9,11 +9,11 @@ fastapi-contrib
 jaeger-client
 pydantic[email]
 python-multipart
-pymongo===4.2.0
+pymongo
 firebase-admin
 websockets 
 PyJWT
 bcrypt
 gunicorn
-fastapi-pagination[all]
+fastapi-pagination
 hypercorn
