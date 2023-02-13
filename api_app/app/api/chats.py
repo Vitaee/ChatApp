@@ -62,7 +62,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
         initial_data = await get_messages_of_user(db, current_user)
         print("\n", initial_data, "\n")
        
-        await manager_for_home.broadcast(initial_data) # should response with user chats
+        await manager_for_home.broadcast(initial_data, client_name) # should response with user chats
         
         # wait for messages
         while True:
@@ -72,7 +72,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                     data = await websocket.receive_text()
                     message_data = json.loads(data)
                     latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
-                    await manager_for_home.broadcast(latest_data)
+                    await manager_for_home.broadcast(latest_data, client_name)
                 else:
                     await manager_for_home.connect(websocket, client_name)
             except WebSocketDisconnect as e:

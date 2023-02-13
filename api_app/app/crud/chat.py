@@ -25,10 +25,17 @@ class SocketManager:
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
 
-    async def broadcast(self, data):
+    async def broadcast(self, data, client_name):
         print("\n [LOG] from broadcast function in SocketManager: \t", data, "\n")
-        for connection in self.active_connections:
-            await connection[0].send_json(data)    
+        if client_name:
+            target_socket = self.active_connections[0].get(client_name)
+            if target_socket:
+                print("\n\n\n", target_socket, "\n\n\n")
+                await target_socket.send_json(data)    
+        else:
+            for connection in self.active_connections:
+                await connection[0].send_json(data)    
+        
 
 manager_for_room = SocketManager()
 manager_for_home = SocketManager()
