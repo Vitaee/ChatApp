@@ -58,9 +58,8 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
     """
     print("\n\t", client_name, " <-- connected home page", "\n")
     try:
-        await manager_for_home.connect(client_name)
+        await manager_for_home.connect(websocket, client_name)
         initial_data = await get_messages_of_user(db, current_user)
-        print("\n", initial_data, "\n")
        
         await manager_for_home.broadcast(initial_data, client_name)
         
@@ -74,7 +73,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                     latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
                     await manager_for_home.broadcast(latest_data, client_name)
                 else:
-                    await manager_for_home.connect(client_name)
+                    await manager_for_home.connect(websocket, client_name)
             except WebSocketDisconnect as e:
                 print("[ERR] chats/ WebSocketDisconnect.")
                 print("\n\n\n", e, "\n\n\n")
@@ -83,7 +82,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                 break
 
     except WebSocketDisconnect as e:
-        manager_for_home.disconnect(websocket,current_user)
+        manager_for_home.disconnect(current_user)
         print("\n\n\n", e, "\n\n\n")
         await manager_for_home.broadcast({ "err": "client disconnected!"})
 
