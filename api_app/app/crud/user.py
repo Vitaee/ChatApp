@@ -51,4 +51,5 @@ async def get_messages(conn: AsyncIOMotorClient, room_name:str):
     if row:
         return jsonable_encoder(row["messages"])
     else:
-        return None
+        print("can not get messages!")
+        return []

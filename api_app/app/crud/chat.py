@@ -17,13 +17,14 @@ class SocketManager:
     async def connect(self, websocket: WebSocket, room:str,):
         await websocket.accept()
         self.active_connections[room] = websocket
-        print("\n\n\n", "connection opened --> ", self.active_connections[room], "\n\n\n")
+        print("\n", "connection opened --> ", self.active_connections[room], "\n^^^^")
 
     def disconnect(self, room:str):
         try:
             self.active_connections.pop(room, None)
         except Exception as e: 
-            print("\n\n\n", e, " ^^^ from disconnect function! \n\n\n")
+            print("\n", e, " \n ^^^ from disconnect function!")
+    
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
 
@@ -32,10 +33,10 @@ class SocketManager:
         
         target_socket = self.active_connections.get(client_name)
         if target_socket:
-            print("\n\n\n", target_socket, "\n\n\n")
+            print("\n", target_socket, "\n^^^ target socket printed")
             await target_socket.send_json(data)   
         else:
-            print("\n\n\n", "can not broadcast data!", "\n\n\n") 
+            print("\n", "can not broadcast data!", "\n") 
             return
 
 manager_for_room = SocketManager()

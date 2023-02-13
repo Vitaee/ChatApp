@@ -17,13 +17,15 @@ router = APIRouter()
 
 @router.websocket("/chat/{room_name}/")
 async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, room_name: str = None, current_user: str = Header(None)):
-    print("\n\t", current_user , " <-- connected.\n")
+    print("\n", current_user , " <-- connected.\n")
     current_username = current_user
     try:
         await manager_for_room.connect(websocket, room_name)
         await insert_room(db, current_username, room_name)
         all_messages = await get_messages(db, room_name)
+        print("\nall messages from room\n")
         await manager_for_room.broadcast(all_messages, room_name)
+        print("\n data broadcasted \n")
 
         # wait for messages
         while True:
@@ -42,9 +44,9 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                 else:
                     await manager_for_room.connect(websocket, room_name)
             except WebSocketDisconnect: 
-                print("[ERR] chat/room/ websocket.application_state error occured.")
-                manager_for_room.disconnect(room_name)
+                print("[ERR] chat/room/ error.")
                 await manager_for_room.broadcast({ "err": "client disconnected!"}, room_name)
+                manager_for_room.disconnect(room_name)
                 break
 
     except WebSocketDisconnect:
@@ -119,7 +121,6 @@ async def get_messages_of_user(db: AsyncIOMotorClient, current_user: str =None):
                     to_response["msg_saw_by_tusr"] = i["messages"][-1]["msg_saw_by_tusr"]
 
                 chat_response["chats"].append(to_response)
-            print("\n [LOG] from get_messages_of_user after first for loop: \t", get_username, "\n")
             return  jsonable_encoder(chat_response)
 
         else:
