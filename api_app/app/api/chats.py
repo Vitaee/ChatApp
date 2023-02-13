@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.websocket("/chat/{room_name}/")
 async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), websocket: WebSocket = WebSocket, room_name: str = None, current_user: str = Header(None)):
-    print("\n", current_user , " <-- connected.\n")
+    print("\n", current_user , " <-- connected on room.\n")
     current_username = current_user
     try:
         await manager_for_room.connect(websocket, room_name)
@@ -49,8 +49,11 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                 manager_for_room.disconnect(room_name)
                 break
 
-    except WebSocketDisconnect:
-        manager_for_room.disconnect(websocket, room_name)
+    except Exception as e:
+        print("exception in room socket!")
+        print(e)
+        print("^^^^ error printed\n")
+        manager_for_room.disconnect(room_name)
         
 
 @router.websocket("/chats/{client_name}/")
@@ -58,7 +61,7 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
     """
     This function will listen users and check if they send message other users.
     """
-    print("\n\t", client_name, " <-- connected home page", "\n")
+    print("\n", client_name, " <-- connected home page", "\n")
     try:
         await manager_for_home.connect(websocket, client_name)
         initial_data = await get_messages_of_user(db, current_user)
@@ -79,12 +82,12 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
             except WebSocketDisconnect as e:
                 print("[ERR] chats/ WebSocketDisconnect.")
                 print("\n\n\n", e, "\n\n\n")
-                await manager_for_home.broadcast({ "err": "client disconnected!"}, client_name)
+                await manager_for_home.broadcast([{}], client_name)
                 manager_for_home.disconnect(client_name)
                 break
 
     except WebSocketDisconnect as e:
-        await manager_for_home.broadcast({ "err": "client disconnected!"}, client_name)
+        await manager_for_home.broadcast([{}], client_name)
         manager_for_home.disconnect(client_name)
         print("\n\n\n", e, "\n\n\n")
 

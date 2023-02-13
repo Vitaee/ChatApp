@@ -22,8 +22,9 @@ class SocketManager:
     def disconnect(self, room:str):
         try:
             self.active_connections.pop(room, None)
+            print("websocket disconnected!")
         except Exception as e: 
-            print("\n", e, " \n ^^^ from disconnect function!")
+            print("\n", e, " <-- from disconnect function!", "\n")
     
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_text(message)
@@ -37,7 +38,7 @@ class SocketManager:
             await target_socket.send_json(data)   
         else:
             print("\n", "can not broadcast data!", "\n") 
-            return
+            await target_socket.send_json([{}])
 
 manager_for_room = SocketManager()
 manager_for_home = SocketManager()
