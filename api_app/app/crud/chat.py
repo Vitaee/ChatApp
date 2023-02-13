@@ -11,15 +11,15 @@ from fastapi.encoders import jsonable_encoder
 
 class SocketManager:
     def __init__(self):
-        self.active_connections: List[(WebSocket, str)] = []
+        self.active_connections = {}
 
     async def connect(self, websocket: WebSocket, room:str,):
         await websocket.accept()
-        self.active_connections.append((websocket,room))
+        self.active_connections[room] = websocket
 
-    def disconnect(self, websocket: WebSocket, room:str):
+    def disconnect(self, room:str):
         try:
-            self.active_connections.remove((websocket, room))
+            self.active_connections.pop(room)
         except: 
             pass
     async def send_personal_message(self, message: str, websocket: WebSocket):
@@ -27,14 +27,11 @@ class SocketManager:
 
     async def broadcast(self, data, client_name):
         print("\n [LOG] from broadcast function in SocketManager: \t", data, "\n")
-        if client_name:
-            target_socket = self.active_connections[0].get(client_name)
-            if target_socket:
-                print("\n\n\n", target_socket, "\n\n\n")
-                await target_socket.send_json(data)    
-        else:
-            for connection in self.active_connections:
-                await connection[0].send_json(data)    
+        
+        target_socket = self.active_connections.get(client_name)
+        if target_socket:
+            print("\n\n\n", target_socket, "\n\n\n")
+            await target_socket.send_json(data)    
         
 
 manager_for_room = SocketManager()
