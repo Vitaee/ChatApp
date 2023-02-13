@@ -23,7 +23,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
         await manager_for_room.connect(websocket, room_name)
         await insert_room(db, current_username, room_name)
         all_messages = await get_messages(db, room_name)
-        await manager_for_room.broadcast(all_messages, current_user)
+        await manager_for_room.broadcast(all_messages, room_name)
 
         # wait for messages
         while True:
@@ -35,7 +35,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     
                     await upload_message_to_room(db,message_data)
                     all_messages = await get_messages(db, room_name)
-                    await manager_for_room.broadcast(all_messages,current_user)
+                    await manager_for_room.broadcast(all_messages,room_name)
                     
                     data, deviceToken = await get_messages_for_notif(db, current_user)
                     send_notification(data, deviceToken)
@@ -44,7 +44,7 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
             except WebSocketDisconnect: 
                 print("[ERR] chat/room/ websocket.application_state error occured.")
                 manager_for_room.disconnect(room_name)
-                await manager_for_room.broadcast({ "err": "client disconnected!"})
+                await manager_for_room.broadcast({ "err": "client disconnected!"}, room_name)
                 break
 
     except WebSocketDisconnect:
@@ -70,21 +70,21 @@ async def listen_messages(db: AsyncIOMotorClient = Depends(get_database), websoc
                 if websocket.application_state == WebSocketState.CONNECTED:
                     data = await websocket.receive_text()
                     message_data = json.loads(data)
-                    latest_data = await get_messages_of_user(db, message_data[0]['target_user']) #message_data[0]['target_user'])
+                    latest_data = await get_messages_of_user(db, message_data[0]['target_user'])
                     await manager_for_home.broadcast(latest_data, client_name)
                 else:
                     await manager_for_home.connect(websocket, client_name)
             except WebSocketDisconnect as e:
                 print("[ERR] chats/ WebSocketDisconnect.")
                 print("\n\n\n", e, "\n\n\n")
+                await manager_for_home.broadcast({ "err": "client disconnected!"}, client_name)
                 manager_for_home.disconnect(client_name)
-                await manager_for_home.broadcast({ "err": "client disconnected!"})
                 break
 
     except WebSocketDisconnect as e:
-        manager_for_home.disconnect(current_user)
+        await manager_for_home.broadcast({ "err": "client disconnected!"}, client_name)
+        manager_for_home.disconnect(client_name)
         print("\n\n\n", e, "\n\n\n")
-        await manager_for_home.broadcast({ "err": "client disconnected!"})
 
 @router.get("/user/chats/")
 async def get_messages_user(db: AsyncIOMotorClient =  Depends(get_database), current_user: str = Header(None)):
