@@ -19,7 +19,7 @@ class SocketManager:
 
     def disconnect(self, room:str):
         try:
-            self.active_connections.pop(room)
+            self.active_connections.pop(room, None)
         except: 
             pass
     async def send_personal_message(self, message: str, websocket: WebSocket):
