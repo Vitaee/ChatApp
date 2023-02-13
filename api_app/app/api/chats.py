@@ -39,6 +39,9 @@ async def websocket_endpoint(db: AsyncIOMotorClient = Depends(get_database), web
                     all_messages = await get_messages(db, room_name)
                     await manager_for_room.broadcast(all_messages,room_name)
                     
+                    home_page_data = await get_messages_of_user(db, current_user)
+                    await manager_for_home.broadcast(home_page_data, current_user)
+                    
                     data, deviceToken = await get_messages_for_notif(db, current_user)
                     send_notification(data, deviceToken)
                 else:

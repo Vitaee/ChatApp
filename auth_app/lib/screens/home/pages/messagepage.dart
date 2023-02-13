@@ -28,6 +28,7 @@ class _MessagesPageState extends State<MessagesPage> {
 
   @override
   void initState() {
+    print("[LOG] Connection in home page");
     globals.home_channel = IOWebSocketChannel.connect(
         "ws://${globals.prodUrl}/api/chats/${globals.currentUsername}/",
         headers: {"Current-User": globals.currentUsername});
@@ -74,9 +75,7 @@ class _MessagesPageState extends State<MessagesPage> {
       Notifications.onNotifications.stream.listen(onClickedNotif);
 
   void onClickedNotif(NotificationResponse? notif) {
-    print(notif!.payload);
-    print("^^^^^^^^^^^^^^");
-    String parsed = notif.payload!.toString();
+    String parsed = notif!.payload!.toString();
 
     List<MessageData> notif_data = json
         .decode(parsed)["chats"]
@@ -93,9 +92,6 @@ class _MessagesPageState extends State<MessagesPage> {
       builder: (context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.waiting) {
           if (snapshot.data.toString().length > 5) {
-            print(snapshot.data);
-            print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-
             try {
               List parsed = snapshot.data != null
                   ? json.decode(snapshot.data)["chats"]
@@ -126,7 +122,7 @@ class _MessagesPageState extends State<MessagesPage> {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return Center(
                       child: Text(
-                          "Text with someone! ${globals.currentUsername} ${snapshot.data}"),
+                          "Text with someone! ${globals.currentUsername}!"),
                     );
                   }, childCount: 1),
                 ),
@@ -143,11 +139,10 @@ class _MessagesPageState extends State<MessagesPage> {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
-    globals.home_channel.sink.close(status.goingAway);
-    //globals.home_channel.sink.close();
-    //widget.home_channel.sink.close();
+    print("home channel closing!!");
+    await globals.home_channel.sink.close(status.goingAway);
   }
 }
 
@@ -163,6 +158,7 @@ class _MessageTilesState extends State<MessageTiles> {
   @override
   void initState() {
     //myFuture = getChats();
+    print("MESSAGE TILES**********************");
     super.initState();
   }
 
@@ -177,7 +173,8 @@ class _MessageTilesState extends State<MessageTiles> {
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return InkWell(
-                      onTap: () => {
+                      onTap: () async => {
+                        await globals.home_channel.sink.close(status.goingAway),
                         Navigator.of(context)
                             .push(ChatScreen.route(snapshot.data[index]))
                       },
@@ -303,5 +300,12 @@ class _MessageTilesState extends State<MessageTiles> {
         color: Colors.white,
       ),
     );
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    print("home channel closing!! from message tiles*********");
+    await globals.home_channel.sink.close(status.goingAway);
   }
 }

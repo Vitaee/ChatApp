@@ -48,7 +48,8 @@ class ChatScreen extends StatelessWidget {
                 CupertinoIcons.back,
                 size: 28,
               ),
-              onTap: () {
+              onTap: () async {
+                await globals.room_channel.sink.close(status.goingAway);
                 Navigator.of(context).pop();
               }),
         ),
@@ -127,9 +128,8 @@ class _MessageSendBarState extends State<MessageSendBar> {
   @override
   void initState() {
     //listenNotifications();
-
     globals.room_channel = IOWebSocketChannel.connect(
-        "ws://10.80.2.154:8080/api/chat/${widget.roomName}/",
+        "ws://${globals.prodUrl}/api/chat/${widget.roomName}/",
         headers: {"Current-User": "${widget.sourceUser}"});
 
     globals.targetUser = widget.targetUser;
