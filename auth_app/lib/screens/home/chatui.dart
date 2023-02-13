@@ -4,6 +4,7 @@ import 'package:auth_app/screens/search/searchui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 import '../profile/userprofile.dart';
 

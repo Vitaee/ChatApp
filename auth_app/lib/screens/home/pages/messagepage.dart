@@ -174,7 +174,7 @@ class _MessageTilesState extends State<MessageTiles> {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return InkWell(
                       onTap: () async => {
-                        await globals.home_channel.sink.close(status.goingAway),
+                        //await globals.home_channel.sink.close(status.goingAway),
                         Navigator.of(context)
                             .push(ChatScreen.route(snapshot.data[index]))
                       },
@@ -306,6 +306,6 @@ class _MessageTilesState extends State<MessageTiles> {
   void dispose() async {
     super.dispose();
     print("home channel closing!! from message tiles*********");
-    await globals.home_channel.sink.close(status.goingAway);
+    //await globals.home_channel.sink.close(status.goingAway);
   }
 }
