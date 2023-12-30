@@ -167,8 +167,7 @@ async def get_messages_for_notif(db: AsyncIOMotorClient, current_user: str =None
     chat_response = { "chats": [] }
 
     try:
-        get_username =  await db["chat-app"]["rooms"].find_one( {'created_by':f'{current_user}'} )
-        if get_username:
+        if get_username := await db["chat-app"]["rooms"].find_one( {'created_by':f'{current_user}'} ):
             
             to_response = {}
             target_user = await db["chat-app"]['users'].find_one( { 'username' :  get_username['target_user'] } )

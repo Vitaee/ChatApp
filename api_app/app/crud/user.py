@@ -10,25 +10,22 @@ from models.user import UserInDB, UserInCreate
 from common.security import generate_salt, get_password_hash, verify_password
 
 async def get_user( conn: AsyncIOMotorClient, field: str, value: str) -> Union[UserInDB, bool]:
-    user = await conn[DB_NAME][USER_COLLECTION_NAME].find_one( { f"{field}" : value } )
     
-    if user:
+    if user := await conn[DB_NAME][USER_COLLECTION_NAME].find_one( { f"{field}" : value } ):
         return UserInDB(**user)
 
     return False
 
 async def get_filtered_users(conn: AsyncIOMotorClient, query: str):
     # users =  await conn[DB_NAME][USER_COLLECTION_NAME].aggregate( [{'$match':{'username':{ "$regex":f'{query}'}}}] ).to_list(length=50)
-    users =  await conn[DB_NAME][USER_COLLECTION_NAME].find( {"username": { "$ne": f'{query}' }}).to_list(length=100)
-    if users:
+    if users := await conn[DB_NAME][USER_COLLECTION_NAME].find( {"username": { "$ne": f'{query}' }}).to_list(length=100):
         return { "result": users }
     else:
         return False
 
 async def check_free_email(conn:AsyncIOMotorClient, email: str = None):
 
-    user_by_email = await get_user(conn, field= "email" , value = email)
-    if user_by_email:
+    if user_by_email := await get_user(conn, field= "email" , value = email):
         raise HTTPException(
             status_code=HTTP_422_UNPROCESSABLE_ENTITY,
             detail="User with this email already exist!",
@@ -47,8 +44,7 @@ async def create_user(conn: AsyncIOMotorClient, user: UserInCreate) -> UserInDB:
     return UserInDB(**user.dict())
 
 async def get_messages(conn: AsyncIOMotorClient, room_name:str):
-    row = await conn[DB_NAME]["rooms"].find_one({"room_name":room_name})
-    if row:
+    if row := await conn[DB_NAME]["rooms"].find_one({"room_name":room_name}):
         return jsonable_encoder(row["messages"])
     else:
         print("can not get messages!")

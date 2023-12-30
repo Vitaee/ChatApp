@@ -32,8 +32,7 @@ class SocketManager:
     async def broadcast(self, data, client_name):
         print("\n [LOG] from broadcast function in SocketManager: \t", data, "\n")
         
-        target_socket = self.active_connections.get(client_name)
-        if target_socket:
+        if target_socket := self.active_connections.get(client_name):
             print("\n", target_socket, "\n^^^ target socket printed")
             await target_socket.send_json(data)   
         else:
@@ -79,9 +78,8 @@ async def get_rooms(db: AsyncIOMotorClient, username: str = None):
 
 async def get_room(db: AsyncIOMotorClient, room_name : str = None):
     "get room of current user & other user"
-    row = await db["chat-app"]["rooms"].find_one( {"room_name":room_name} )
 
-    if row is not None:
+    if (row := await db["chat-app"]["rooms"].find_one( {"room_name":room_name} )) is not None:
         return row
     else:
         return None
