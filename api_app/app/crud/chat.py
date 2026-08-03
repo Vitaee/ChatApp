@@ -103,5 +103,5 @@ async def upload_message_to_room(db:AsyncIOMotorClient, data) -> bool:
         return True
 
     except Exception as e:
-        print("An error accured while uploading message to db  " ,e)
+        print("An error occurred while uploading message to db  " ,e)
         return False
